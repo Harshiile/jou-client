@@ -1,8 +1,18 @@
+import { useEffect } from "react"
 import { useChannels } from "../context/channels"
 import { AsyncFetcher } from '../lib/Fetcher'
+import { socket } from "../socket"
+import { Button } from '../components/ui/button'
 
 function App() {
   const [channels] = useChannels()
+  useEffect(() => {
+    socket.connect()
+    socket.on('uploading-progress', data => console.log(data))
+    return () => {
+      socket.off('uploading-progress')
+    }
+  }, [])
 
   // const connectYoutubeHandler = AsyncFetcher({
   //   url: '/api/get/oauth/youtube/url',
@@ -21,9 +31,12 @@ function App() {
 
     fetch(`http://localhost:3000/api/drive/upload`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: {
+        'socket': socket.id
+      }
     })
-      .then(res => res.json())  
+      .then(res => res.json())
       .then(res => console.log(res))
   }
 
@@ -47,7 +60,7 @@ function App() {
           })
         }
       </div>
-
+      <Button variant="default">Click</Button>
       <div className="m-10">
         <form formEncType="multipart/form-data" onSubmit={handleSubmit}>
           <input type="file" />
