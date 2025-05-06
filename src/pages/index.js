@@ -1,7 +1,7 @@
 import App from "./App"
-import GetYTInfo from "./GetYTInfo"
+import Login from "./Login"
 
 export {
     App,
-    GetYTInfo
+    Login,
 }

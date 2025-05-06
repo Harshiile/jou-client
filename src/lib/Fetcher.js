@@ -1,9 +1,21 @@
-export const AsyncFetcher = ({ url, cb }) => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}${url}`)
-        .then(res => res.json())
-        .then(({ status, message, data, errorMsg }) => {
-            if (status == 200) cb()
-            else console.log('Error : ', errorMsg);
+import { toast } from "sonner"
+
+export const AsyncFetcher = ({ url, cb, methodType, bodyData }) => {
+    const fetchOptions = methodType == 'POST' ?
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+        } : {}
+
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api${url}`, fetchOptions)
+        .then(async res => {
+            const returnRes = await res.json()
+            if (!res.ok) throw new Error(returnRes.message)
+            return returnRes
         })
-        .catch(err => console.error(err))
+        .then(cb)
+        .catch(err => toast.error(err.toString().split('Error: ')[1]))
 }

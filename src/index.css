@@ -3,9 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+*{
+  /* border-color: #27272a; */
+  /* background-color: #09090b; */
+  /* color:#e3e3e3; */
+}
 body{
-  background-color: #080808;
-  color:whitesmoke;
+  background-color: #09090b;
+  color:#e3e3e3;
   min-width: 100vw;
   min-height: 100vh;
   display: grid;

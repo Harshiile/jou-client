@@ -1,19 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { App, GetYTInfo } from '../src/pages'
+import { App, Login } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { ChannelsProvider } from './context/channels'
+import { ChannelsProvider, AccessTokenProvider } from './context'
+import { Toaster } from "./components/ui/sonner"
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <ChannelsProvider>
-        <Routes>
-          <Route path='/' element={<App />} />
-          <Route path='/get/youtube/info' element={<GetYTInfo />} />
-        </Routes>
-      </ChannelsProvider>
+      <AccessTokenProvider>
+        <ChannelsProvider>
+          <Routes>
+            <Route path='/' element={<App />} />
+            <Route path='/login' element={<Login />} />
+          </Routes>
+        </ChannelsProvider>
+      </AccessTokenProvider>
+      <Toaster />
     </BrowserRouter>
   </StrictMode>,
 )

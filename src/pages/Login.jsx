@@ -1,0 +1,110 @@
+import React, { useState } from 'react';
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
+import { toast } from "sonner"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { AsyncFetcher } from '../lib/Fetcher';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const Login = () => {
+    const [isLogin, setIsLogin] = useState(false)
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [role, setRole] = useState()
+    const [password, setPassword] = useState('')
+    return <>
+        <div className='w-[25vw] px-4 py-6 border border-[#27272a] rounded-xl flex flex-col gap-y-6'>
+            <p className='text-2xl font-bold'>
+                {isLogin ? 'Log In' : 'Sign Up'}
+            </p>
+            <div className='flex flex-col items-start'>
+                <Label htmlFor='email' className='mb-2 text-md' >Email</Label>
+                <Input
+                    id='email'
+                    className='border border-[#27272a] text-md'
+                    placeholder='example@gmail.com'
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                />
+            </div>
+            <AnimatePresence>
+                {
+                    !isLogin &&
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                    >
+                        <Label htmlFor='name' className='mb-2 text-md' >Name</Label>
+                        <Input
+                            id='name'
+                            className='border border-[#27272a] text-md'
+                            placeholder='John Doe'
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                        />
+                    </motion.div>
+                }
+            </AnimatePresence>
+            <div className='flex flex-col items-start'>
+                <Label htmlFor='password' className='mb-2 text-md' >Password</Label>
+                <Input
+                    id='password'
+                    className='border border-[#27272a] text-md'
+                    placeholder='xxxxxxxx'
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                />
+            </div>
+            <AnimatePresence>
+                {
+                    !isLogin &&
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                    >
+                        <Label className='mb-2 text-md' >Role</Label>
+                        <Select onValueChange={value => setRole(value)}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Role" />
+                            </SelectTrigger>
+                            <SelectContent className='bg-[#09090b] text-[#e3e3e3]'>
+                                <SelectItem value="0" className='bg-[#09090b] text-[#e3e3e3]'>Youtuber</SelectItem>
+                                <SelectItem value="1" className='bg-[#09090b] text-[#e3e3e3]'>Editor</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </motion.div>
+                }
+            </AnimatePresence>
+            <div className='flex gap-x-2 text-sm mx-auto'>
+                <p>
+                    {isLogin ? 'Not have an account?' : 'Already have an account?'}
+                </p>
+                <p onClick={_ => setIsLogin(!isLogin)} className='cursor-pointer'>
+                    {isLogin ? 'Sign up' : 'Log in'}
+                </p>
+            </div>
+            <Button variant="secondary" className='text-md cursor-pointer' onClick={() => {
+                AsyncFetcher({
+                    url: isLogin ? '/login' : '/signup',
+                    methodType: 'POST',
+                    bodyData: isLogin ? { email, password } : { email, password, role, name },
+                    cb: (res) => { console.log(res); toast.success(res.message) }
+                })
+            }}>
+                {!isLogin ? 'Sign up' : 'Log in'}
+            </Button>
+        </div>
+    </>
+};
+export default Login;
