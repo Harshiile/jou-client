@@ -15,10 +15,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(false)
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [role, setRole] = useState()
-    const [password, setPassword] = useState('')
+    const [name, setName] = useState(null)
+    const [email, setEmail] = useState(null)
+    const [role, setRole] = useState(null)
+    const [password, setPassword] = useState(null)
     return <>
         <div className='w-[25vw] px-4 py-6 border border-[#27272a] rounded-xl flex flex-col gap-y-6'>
             <p className='text-2xl font-bold'>
@@ -59,7 +59,7 @@ const Login = () => {
                 <Input
                     id='password'
                     className='border border-[#27272a] text-md'
-                    placeholder='xxxxxxxx'
+                    placeholder='••••••••••'
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                 />
@@ -86,15 +86,11 @@ const Login = () => {
                     </motion.div>
                 }
             </AnimatePresence>
-            <div className='flex gap-x-2 text-sm mx-auto'>
-                <p>
-                    {isLogin ? 'Not have an account?' : 'Already have an account?'}
-                </p>
-                <p onClick={_ => setIsLogin(!isLogin)} className='cursor-pointer'>
-                    {isLogin ? 'Sign up' : 'Log in'}
-                </p>
-            </div>
             <Button variant="secondary" className='text-md cursor-pointer' onClick={() => {
+                if (!email) { toast.error('Email is required'); return; }
+                if (!password) { toast.error('Password is required'); return; }
+                if (!isLogin && !role) { toast.error('Role is required'); return; }
+                if (!isLogin && !name) { toast.error('Name is required'); return; }
                 AsyncFetcher({
                     url: isLogin ? '/login' : '/signup',
                     methodType: 'POST',
@@ -104,6 +100,14 @@ const Login = () => {
             }}>
                 {!isLogin ? 'Sign up' : 'Log in'}
             </Button>
+            <div className='flex gap-x-2 text-sm mx-auto'>
+                <p>
+                    {isLogin ? 'Not have an account?' : 'Already have an account?'}
+                </p>
+                <p onClick={_ => setIsLogin(!isLogin)} className='cursor-pointer text-[#3b82f6] hover:underline transition'>
+                    {isLogin ? 'Sign up' : 'Log in'}
+                </p>
+            </div>
         </div>
     </>
 };

@@ -23,6 +23,9 @@ function App() {
     const formData = new FormData();
     formData.append('file', file)
 
+    formData.forEach(item => {
+      console.log(item);
+    })
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/drive/upload`, {
       method: 'POST',
       body: formData,
