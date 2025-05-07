@@ -8,7 +8,7 @@ const fadeSlide = {
     exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2 } },
 };
 
-const FileInfo = ({ file, setFile, setPreviewUrl }) => {
+const FileInfo = ({ file, setFile, setVideoPreviewUrl }) => {
     return (
         <motion.div
             variants={fadeSlide}
@@ -27,7 +27,7 @@ const FileInfo = ({ file, setFile, setPreviewUrl }) => {
                 className='w-6 h-6 cursor-pointer absolute top-2 right-2 text-[#a1a1aa] hover:text-red-500 transition-colors rounded-full p-1 hover:bg-secondary'
                 onClick={() => {
                     setFile(null);
-                    setPreviewUrl(null);
+                    setVideoPreviewUrl(null);
                 }}
             />
         </motion.div>

@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { App, Login, Upload } from '../src/pages'
+import { App, Dashboard, Layout, Login, Upload } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ChannelsProvider, AccessTokenProvider } from './context'
 import { Toaster } from "./components/ui/sonner"
@@ -12,9 +12,12 @@ createRoot(document.getElementById('root')).render(
       <AccessTokenProvider>
         <ChannelsProvider>
           <Routes>
-            <Route path='/' element={<App />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/upload' element={<Upload />} />
+            <Route path='' element={<App />} />
+            <Route path='login' element={<Login />} />
+            <Route path='/' element={<Layout />}>
+              <Route path='upload' element={<Upload />} />
+              <Route path='dashboard' element={<Dashboard />} />
+            </Route>
           </Routes>
         </ChannelsProvider>
       </AccessTokenProvider>

@@ -4,6 +4,7 @@ import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Separator } from '../../components/ui/separator';
+import { ScrollArea } from '../../components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { toast } from "sonner";
 import { UploadCloud } from 'lucide-react';
@@ -58,97 +59,118 @@ const Upload = () => {
     };
 
     return (
-        <div className='w-[75vw] h-[80vh] px-8 py-8 border border-secondary rounded-2xl bg-primary text-[#e3e3e3] shadow-xl flex'>
-            {/* Left */}
-            <div className='flex flex-col gap-y-6 flex-1'>
-                <p className='text-3xl font-bold text-center mb-4'>Upload Video</p>
+        <div className='w-full h-full px-8 border border-secondary bg-primary text-[#e3e3e3] shadow-xl flex flex-col'>
 
-                <form formEncType="multipart/form-data" onSubmit={handleUpload} className='flex flex-col gap-y-6'>
-                    {/* Video Upload */}
-                    <input hidden id='file' type='file' accept='video/*' ref={videoInputRef} onChange={handleVideoChange} />
-                    <AnimatePresence>
-                        {!videoPreviewUrl ? (
-                            <motion.div
-                                className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
-                                onClick={() => videoInputRef.current?.click()}
-                                variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                            >
-                                <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
-                                <p className='text-md text-[#d4d4d8]'>Click to upload video</p>
-                                <p className='text-xs text-[#71717a]'>MP4, WebM, or MOV</p>
-                            </motion.div>
-                        ) : (
-                            <motion.video
-                                src={videoPreviewUrl}
-                                controls
-                                controlsList='nodownload'
-                                disablePictureInPicture
-                                disableRemotePlayback
-                                className='rounded-xl border border-secondary shadow-lg mb-3'
-                                variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                            />
-                        )}
-                    </AnimatePresence>
+            {/* Upload Title */}
+            <p className='text-3xl font-bold text-center py-3 mb-4' >Upload Video</p>
 
-                    <AnimatePresence>
-                        {file && (
-                            <FIleInfo file={file} setFile={setFile} setVideoPreviewUrl={setVideoPreviewUrl} />
-                        )}
-                    </AnimatePresence>
+            {/* Upload Section */}
+            <div className='flex'>
 
-                    <div className='flex flex-col gap-y-4'>
-                        <Label htmlFor='title'>Title</Label>
-                        <Input id='title' className='border border-secondary' placeholder='Video Title' value={title} onChange={e => setTitle(e.target.value)} />
+                {/* Left Section */}
+                <ScrollArea className="h-[100vh] flex flex-col gap-y-6 flex-1">
+                    <form formEncType="multipart/form-data" onSubmit={handleUpload} className='flex flex-col gap-y-6'>
 
-                        <Label>Description</Label>
-                        <Textarea className='border border-secondary' placeholder='Video Description' value={desc} onChange={e => setDesc(e.target.value)} />
+                        <div className='flex flex-col gap-y-4'>
+                            <div>
+                                <Label htmlFor='title' className='text-md mb-2'>Title</Label>
+                                <Input id='title' className='border border-secondary' placeholder='Video Title' value={title} onChange={e => setTitle(e.target.value)} />
+                            </div>
 
-                        <Label>Schedule</Label>
-                        <Schedule date={date} setDate={setDate} />
+                            <div>
+                                <Label htmlFor='title' className='text-md mb-2'>Description</Label>
+                                <Textarea className='border border-secondary' placeholder='Video Description' value={desc} onChange={e => setDesc(e.target.value)} />
+                            </div>
 
-                        <Label>Video Type</Label>
-                        <Select onValueChange={setVideoType}>
-                            <SelectTrigger className='w-full border border-secondary'>
-                                <SelectValue placeholder='Select Type' />
-                            </SelectTrigger>
-                            <SelectContent className='bg-primary text-[#e3e3e3]'>
-                                <SelectItem value='0'>Public</SelectItem>
-                                <SelectItem value='1'>Private</SelectItem>
-                                <SelectItem value='2'>Unlisted</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            <div>
+                                <Label htmlFor='title' className='text-md mb-2'>Schedule</Label>
+                                <Schedule date={date} setDate={setDate} />
+                            </div>
+
+                            <div>
+                                <Label className='text-md mb-2'>Video Type</Label>
+                                <Select onValueChange={setVideoType}>
+                                    <SelectTrigger className='w-full border border-secondary'>
+                                        <SelectValue placeholder='Select Type' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-primary text-[#e3e3e3]'>
+                                        <SelectItem value='0'>Public</SelectItem>
+                                        <SelectItem value='1'>Private</SelectItem>
+                                        <SelectItem value='2'>Unlisted</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Thumbnail */}
+                            <div>
+                                <Label htmlFor='thumbnail' className='text-md mb-2'>Thumbnail</Label>
+                                <input hidden id='thumbnail' type='file' accept='image/*' ref={thumbnailInputRef} onChange={handleThumbnailChange} />
+
+                                <AnimatePresence>
+                                    {!thumbnailPreviewUrl ? (
+                                        <motion.div
+                                            className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
+                                            onClick={() => thumbnailInputRef.current?.click()}
+                                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                        >
+                                            <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
+                                            <p className='text-md text-[#d4d4d8]'>Click to upload thumbnail</p>
+                                            <p className='text-xs text-[#71717a]'>JPG, PNG, or WEBP</p>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.img
+                                            src={thumbnailPreviewUrl}
+                                            className='rounded-xl border border-secondary shadow-lg max-h-[30vh] w-full object-contain'
+                                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                        />
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+
+                        {/* Upload Button */}
+                        <UploaderDrawer isUploading={isUploading} setIsUploading={setIsUploading} progress={progress} />
+                    </form>
+                </ScrollArea>
+
+                <Separator orientation='vertical' className='mx-12 bg-secondary w-[2px]' />
+
+                {/* Right Section */}
+                <div className='flex flex-col gap-y-6 flex-1'>
+                    <div>
+                        <Label htmlFor='file' className='text-md mb-2'>Video</Label>
+                        <input hidden id='file' type='file' accept='video/*' ref={videoInputRef} onChange={handleVideoChange} />
+                        <AnimatePresence>
+                            {!videoPreviewUrl ? (
+                                <motion.div
+                                    className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
+                                    onClick={() => videoInputRef.current?.click()}
+                                    variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                >
+                                    <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
+                                    <p className='text-md text-[#d4d4d8]'>Click to upload video</p>
+                                    <p className='text-xs text-[#71717a]'>MP4, WebM, or MOV</p>
+                                </motion.div>
+                            ) : (
+                                <motion.video
+                                    src={videoPreviewUrl}
+                                    controls
+                                    controlsList='nodownload'
+                                    disablePictureInPicture
+                                    disableRemotePlayback
+                                    className='rounded-xl border border-secondary shadow-lg mb-3'
+                                    variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                />
+                            )}
+                        </AnimatePresence>
+
+                        <AnimatePresence>
+                            {file && (
+                                <FIleInfo file={file} setFile={setFile} setVideoPreviewUrl={setVideoPreviewUrl} />
+                            )}
+                        </AnimatePresence>
                     </div>
-
-                    <UploaderDrawer isUploading={isUploading} setIsUploading={setIsUploading} progress={progress} />
-                </form>
-            </div>
-
-            <Separator orientation='vertical' className='mx-12 bg-secondary w-[2px]' />
-
-            {/* Right */}
-            <div className='flex flex-col gap-y-6 flex-1'>
-                <Label>Thumbnail</Label>
-                <input hidden id='thumbnail' type='file' accept='image/*' ref={thumbnailInputRef} onChange={handleThumbnailChange} />
-
-                <AnimatePresence>
-                    {!thumbnailPreviewUrl ? (
-                        <motion.div
-                            className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
-                            onClick={() => thumbnailInputRef.current?.click()}
-                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                        >
-                            <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
-                            <p className='text-md text-[#d4d4d8]'>Click to upload thumbnail</p>
-                            <p className='text-xs text-[#71717a]'>JPG, PNG, or WEBP</p>
-                        </motion.div>
-                    ) : (
-                        <motion.img
-                            src={thumbnailPreviewUrl}
-                            className='rounded-xl border border-secondary shadow-lg max-h-[30vh] w-full object-contain'
-                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                        />
-                    )}
-                </AnimatePresence>
+                </div>
             </div>
         </div>
     );
