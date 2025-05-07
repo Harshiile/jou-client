@@ -1,6 +1,6 @@
 import App from "./App"
-import Login from "./Login"
-import Upload from "./Upload"
+import Login from "./Login/Login"
+import Upload from "./Upload/Upload"
 
 export {
     App,

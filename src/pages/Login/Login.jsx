@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
 import { toast } from "sonner"
 import {
     Select,
@@ -10,7 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { AsyncFetcher } from '../lib/Fetcher';
+import { AsyncFetcher } from '../../lib/Fetcher';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Login = () => {
