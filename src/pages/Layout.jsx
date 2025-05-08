@@ -73,7 +73,7 @@ const Layout = () => {
       </SidebarProvider>
 
       {/* Right - Upper*/}
-      <div className='w-[90vw] h-[7vh] flex items-center justify-end fixed top-0 left-[10vw] bg-primary border-b border-secondary text-white'>
+      <div className='w-[90vw] h-[7vh] flex items-center justify-end fixed top-0 left-[10vw] border-b border-secondary bg-primary text-white'>
         <div className='flex items-center gap-x-6 pr-10'>
 
           {/* Notifications */}

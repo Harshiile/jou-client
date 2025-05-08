@@ -7,21 +7,19 @@ import { ChannelsProvider, AccessTokenProvider } from './context'
 import { Toaster } from "./components/ui/sonner"
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AccessTokenProvider>
-        <ChannelsProvider>
-          <Routes>
-            <Route path='' element={<App />} />
-            <Route path='login' element={<Login />} />
-            <Route path='/' element={<Layout />}>
-              <Route path='upload' element={<Upload />} />
-              <Route path='dashboard' element={<Dashboard />} />
-            </Route>
-          </Routes>
-        </ChannelsProvider>
-      </AccessTokenProvider>
-      <Toaster />
-    </BrowserRouter>
-  </StrictMode>,
+  <BrowserRouter>
+    <AccessTokenProvider>
+      <ChannelsProvider>
+        <Routes>
+          <Route path='/' element={<App />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/' element={<Layout />}>
+            <Route path='upload' element={<Upload />} />
+            <Route path='dashboard' element={<Dashboard />} />
+          </Route>
+        </Routes>
+      </ChannelsProvider>
+    </AccessTokenProvider>
+    <Toaster />
+  </BrowserRouter>
 )

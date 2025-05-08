@@ -59,7 +59,7 @@ const Upload = () => {
     };
 
     return (
-        <div className='w-full h-full px-8 border border-secondary bg-primary text-[#e3e3e3] shadow-xl flex flex-col'>
+        <div className='w-full h-full px-8 bg-primary text-[#e3e3e3] shadow-xl flex flex-col'>
 
             {/* Upload Title */}
             <p className='text-3xl font-bold text-center py-3 mb-4' >Upload Video</p>
@@ -158,7 +158,7 @@ const Upload = () => {
                                     controlsList='nodownload'
                                     disablePictureInPicture
                                     disableRemotePlayback
-                                    className='rounded-xl border border-secondary shadow-lg mb-3'
+                                    className='rounded-xl border border-secondary shadow-lg mb-3 w-full'
                                     variants={fadeIn} initial='hidden' animate='visible' exit='exit'
                                 />
                             )}

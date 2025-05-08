@@ -3,6 +3,8 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { toast } from "sonner"
+
+// import {} from 'json-schema'
 import {
     Select,
     SelectContent,
@@ -14,11 +16,11 @@ import { AsyncFetcher } from '../../lib/Fetcher';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Login = () => {
-    const [isLogin, setIsLogin] = useState(false)
-    const [name, setName] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [role, setRole] = useState(null)
-    const [password, setPassword] = useState(null)
+    const [isLogin, setIsLogin] = useState(true)
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [role, setRole] = useState('')
+    const [password, setPassword] = useState('')
     return <>
         <div className='w-[25vw] px-4 py-6 border border-[#27272a] rounded-xl flex flex-col gap-y-6'>
             <p className='text-2xl font-bold'>
@@ -86,7 +88,7 @@ const Login = () => {
                     </motion.div>
                 }
             </AnimatePresence>
-            <Button variant="secondary" className='text-md cursor-pointer' onClick={() => {
+            <Button variant="default" className='bg-white text-primary hover:bg-[#ffffffc7] text-md cursor-pointer' onClick={() => {
                 if (!email) { toast.error('Email is required'); return; }
                 if (!password) { toast.error('Password is required'); return; }
                 if (!isLogin && !role) { toast.error('Role is required'); return; }
