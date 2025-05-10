@@ -10,9 +10,12 @@ import VideoCard from './components/VideoCard'
 
 const Dashboard = () => {
     const [user, setUser] = useState({
-        type: 'editor'
+        id: '298446e0-745d-4ff5-b34c-d44f45b9e7b5',
+        role: 'youtuber'
     })
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+    const [videos, setVideos] = useState(null)
+    const [filterVideos, setFilterVideos] = useState(null)
     const [workSpaces, setWorkSpaces] = useState(data)
     const [video, setVideo] = useState({
         editor: "bdb6961b-926d-4f11-afbe-87d9fb689a2d",
@@ -36,14 +39,10 @@ const Dashboard = () => {
         date: "2 weeks ago"
     })
     useEffect(() => {
-        // AsyncFetcher({
-        //     url: `/get/workspace?userId=298446e0-745d-4ff5-b34c-d44f45b9e7b5&role=youtuber`,
-        //     cb: ({ data }) => { setWorkSpaces(data.workspaces); }
-        // })
-        // AsyncFetcher({
-        //     url: `/get/videos?workspace=279c57a2-9236-44fa-9356-1159d87c83d1`,
-        //     cb: ({ data }) => { console.log(data.videos); }
-        // })
+        AsyncFetcher({
+            url: `/get/workspaces?userId=${user.id}&role=${user.role}`,
+            cb: ({ data }) => { setWorkSpaces(data.workspaces); }
+        })
     }, [])
     const getTypeBadgeStyle = (type) => {
         switch (type.toLowerCase()) {
@@ -91,7 +90,13 @@ const Dashboard = () => {
 
     return (
         <div className='flex flex-col gap-y-15 h-[90vh] mt-7'>
-            <ChannelDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
+            <ChannelDrawer
+                open={isDrawerOpen}
+                onOpenChange={setIsDrawerOpen}
+                videos={videos}
+                filterVideos={filterVideos}
+                setFilterVideos={setFilterVideos}
+            />
             <div className='w-[85vw] flex flex-col item-start border border-secondary p-5 rounded-xl'>
                 <p className='text-xl font-bold'>Recent Activity</p>
                 <div className='mt-4 flex flex-col gap-y-3'>
@@ -125,7 +130,13 @@ const Dashboard = () => {
                         <div
                             key={ws.id}
                             className="border border-secondary bg-primary py-4 px-6 rounded-xl hover:shadow-lg transition-shadow duration-300"
-                            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                            onClick={e => {
+                                AsyncFetcher({
+                                    url: `/get/videos?workspace=${ws.id}`,
+                                    cb: ({ data }) => { setVideos(data.metadata); setFilterVideos(data.metadata) }
+                                })
+                                setIsDrawerOpen(!isDrawerOpen)
+                            }}
                         >
                             <div className="flex items-center gap-4">
                                 <img
