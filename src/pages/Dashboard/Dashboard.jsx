@@ -4,21 +4,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from '../../components/ui/button'
 import { Clock, Users, UploadCloud, XCircle, CheckCircle, MoreHorizontal, Video, Eye } from 'lucide-react'
 import { Separator } from '../../components/ui/separator'
-import { Link } from 'react-router-dom'
+import { useUser } from '../../context/user'
 import { ChannelDrawer } from './components/ChannelDrawer'
 import VideoCard from './components/VideoCard'
 
 const Dashboard = () => {
-    const [user, setUser] = useState({
-        id: '298446e0-745d-4ff5-b34c-d44f45b9e7b5',
-        role: 'youtuber'
-    })
+    const [user] = useUser()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     const [videos, setVideos] = useState(null)
     const [filterVideos, setFilterVideos] = useState(null)
     const [workSpaces, setWorkSpaces] = useState(data)
     const [video, setVideo] = useState({
-        editor: "bdb6961b-926d-4f11-afbe-87d9fb689a2d",
         fileId: null,
         id: "c631343f-b087-45b0-96a7-f0f0af44c5a8",
         status: "reviewPending",
@@ -39,6 +35,12 @@ const Dashboard = () => {
         date: "2 weeks ago"
     })
     useEffect(() => {
+        console.log('user : ', user);
+
+        AsyncFetcher({
+            url: `/get/user`,
+            cb: ({ data }) => { console.log(data); }
+        })
         AsyncFetcher({
             url: `/get/workspaces?userId=${user.id}&role=${user.role}`,
             cb: ({ data }) => { setWorkSpaces(data.workspaces); }
@@ -133,7 +135,7 @@ const Dashboard = () => {
                             onClick={e => {
                                 AsyncFetcher({
                                     url: `/get/videos?workspace=${ws.id}`,
-                                    cb: ({ data }) => { setVideos(data.metadata); setFilterVideos(data.metadata) }
+                                    cb: ({ data }) => { console.log(data.metadata); setVideos(data.metadata); setFilterVideos(data.metadata) }
                                 })
                                 setIsDrawerOpen(!isDrawerOpen)
                             }}

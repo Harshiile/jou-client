@@ -3,24 +3,22 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App, Dashboard, Info, Layout, Login, Upload } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { ChannelsProvider, AccessTokenProvider } from './context'
+import ContextProvider from './context/Context'
 import { Toaster } from "./components/ui/sonner"
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <AccessTokenProvider>
-      <ChannelsProvider>
-        <Routes>
-          <Route path='/' element={<App />} />
-          <Route path='/get/youtube/info' element={<Info />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/' element={<Layout />}>
-            <Route path='upload' element={<Upload />} />
-            <Route path='dashboard' element={<Dashboard />} />
-          </Route>
-        </Routes>
-      </ChannelsProvider>
-    </AccessTokenProvider>
+    <ContextProvider>
+      <Routes>
+        <Route path='/' element={<App />} />
+        <Route path='/get/youtube/info' element={<Info />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/' element={<Layout />}>
+          <Route path='upload' element={<Upload />} />
+          <Route path='dashboard' element={<Dashboard />} />
+        </Route>
+      </Routes>
+    </ContextProvider>
     <Toaster />
   </BrowserRouter>
 )

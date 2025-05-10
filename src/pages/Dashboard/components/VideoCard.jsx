@@ -167,7 +167,13 @@ const VideoCard = ({ video, userType, forUse }) => {
             </div>
 
             {/* Right Status Badge */}
-            <div>
+            <div className='flex gap-x-4'>
+                <span
+                    className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
+                >
+                    {/* Editor name */}
+                    <p className="font-bold text-md">@{video.editor}</p>
+                </span>
                 <span
                     className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
                 >

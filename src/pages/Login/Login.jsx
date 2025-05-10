@@ -14,9 +14,13 @@ import {
 } from "@/components/ui/select"
 import { AsyncFetcher } from '../../lib/Fetcher';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useUser } from '../../context/user';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate()
     const [isLogin, setIsLogin] = useState(true)
+    const [_, setUser] = useUser()
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [role, setRole] = useState('')
@@ -93,12 +97,18 @@ const Login = () => {
                 if (!password) { toast.error('Password is required'); return; }
                 if (!isLogin && !role) { toast.error('Role is required'); return; }
                 if (!isLogin && !name) { toast.error('Name is required'); return; }
+
                 AsyncFetcher({
                     url: isLogin ? '/login' : '/signup',
                     methodType: 'POST',
                     bodyData: isLogin ? { email, password } : { email, password, role, name },
-                    cb: (res) => { console.log(res); toast.success(res.message) }
+                    cb: (res) => {
+                        setUser(res.data);
+                        toast.success(res.message);
+                        navigate('/dashboard')
+                    }
                 })
+
             }}>
                 {!isLogin ? 'Sign up' : 'Log in'}
             </Button>
@@ -110,7 +120,7 @@ const Login = () => {
                     {isLogin ? 'Sign up' : 'Log in'}
                 </p>
             </div>
-        </div>
+        </div >
     </>
 };
 export default Login;
