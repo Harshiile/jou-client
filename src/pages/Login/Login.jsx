@@ -5,7 +5,6 @@ import { Label } from '../../components/ui/label'
 import { toast } from "sonner"
 import logo from '/logo.png'
 
-// import {} from 'json-schema'
 import {
     Select,
     SelectContent,
@@ -107,6 +106,8 @@ const Login = () => {
                         methodType: 'POST',
                         bodyData: isLogin ? { email, password } : { email, password, userType: role, name },
                         cb: ({ message, data }) => {
+                            console.log(data);
+
                             setUser(data.userData);
                             setAccessToken(data.accessToken)
                             console.log('acsTkn : ', data.accessToken);

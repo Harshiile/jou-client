@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Sidebar,
   SidebarContent,
@@ -12,23 +12,30 @@ import {
   SidebarMenuItem,
   SidebarProvider
 } from '../components/ui/sidebar'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu'
-import { LayoutDashboard, Bell, Video, Settings } from 'lucide-react'
-import { Avatar, AvatarImage } from '../components/ui/avatar'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog'
+import { LayoutDashboard, LogOut, Video, Settings } from 'lucide-react'
+import { Button } from '../components/ui/button'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import logo from '/logo.png'
 import { useEffect } from 'react'
 import { fetchMe } from '../lib/FetchMe'
 import { useUser } from "../context/user";
 import { useAccessToken } from "../context/acsTkn";
+import { Separator } from '../components/ui/separator'
+import { AnimatePresence, motion } from 'framer-motion'
+import { AsyncFetcher } from '../lib/Fetcher'
 
 const Layout = () => {
   const [user, setUser] = useUser()
   const [_, setAccessToken] = useAccessToken()
   const currentPath = useLocation()
+  const [open, setOpen] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const buttonRef = useRef()
   useEffect(() => {
-    !user.id && fetchMe(setUser, setAccessToken)
+    // !user.id && fetchMe(setUser, setAccessToken)
   }, [])
+
 
   return (
     <div>
@@ -42,7 +49,7 @@ const Layout = () => {
             </div>
           </SidebarHeader>
 
-          <SidebarContent className='bg-primary text-white'>
+          <SidebarContent className='bg-primary text-white flex justify-between overflow-clip'>
             <SidebarGroup>
               <SidebarGroupLabel className='text-white mb-3'>OVERVIEW</SidebarGroupLabel>
               <SidebarGroupContent>
@@ -67,13 +74,49 @@ const Layout = () => {
               </SidebarGroupContent>
             </SidebarGroup>
 
+            <AnimatePresence>
+              {
+                open &&
+                (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <SidebarGroup className='border-t border-secondary transition-all duration-200'>
+                      <SidebarGroupContent>
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              className='hover:bg-primary hover:text-white hover:cursor-pointer active:bg-primary active:text-white'>
+                              <div className='flex items-center gap-x-2' onClick={_ => setConfirmLogout(true)}>
+                                <LogOut className="h-4 w-4" />
+                                <span className='text-red-500'>Logout</span>
+                              </div>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </SidebarGroupContent>
+                    </SidebarGroup>
+                  </motion.div>
+                )
+              }
+            </AnimatePresence>
           </SidebarContent>
-          <SidebarFooter className="border-t border-secondary pt-2 bg-primary text-white">
+
+          <SidebarFooter className="border-t border-secondary hover:bg-primary pt-2 bg-primary text-white">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Settings className="h-4 w-4" />
-                  <span>Settings</span>
+                <SidebarMenuButton className='hover:bg-primary hover:text-white py-5 active:bg-primary active:text-white'>
+                  <div
+                    ref={buttonRef}
+                    onClick={() => setOpen(!open)}
+                    className='flex gap-x-2 items-center'
+                  >
+                    <span className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer">H</span>
+                    <span className='text-md font-semibold hover:cursor-pointer'>Harshil</span>
+                  </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -82,50 +125,91 @@ const Layout = () => {
       </SidebarProvider>
 
       {/* Right - Upper*/}
-      <div className='w-[90vw] h-[7vh] flex items-center justify-end fixed top-0 left-[10vw] border-b border-secondary bg-primary text-white'>
+      {/* <div className='w-[90vw] h-[7vh] flex items-center justify-end fixed top-0 left-[10vw] border-b border-secondary bg-primary text-white'>
         <div className='flex items-center gap-x-6 pr-10'>
 
-          {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Bell className='w-6 h-6 cursor-pointer text-white transition' />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-80 h-100 bg-primary text-[#e3e3e3] border-secondary shadow-lg -translate-x-30 scroll-auto">
-              <DropdownMenuLabel className="text-lg font-semibold text-white">Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-secondary" />
+                    <DropdownMenuLabel className="text-lg font-semibold text-white">Notifications</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-secondary" />
 
-              <DropdownMenuGroup>
-                {notifications.map((notif, index) => (
-                  <div key={notif.id} className="px-2 py-2">
-                    <p className="text-sm font-medium text-white">{notif.type}</p>
-                    <p className="text-sm text-[#d4d4d8]">{notif.message}</p>
-                    <p className="text-xs text-[#71717a] mt-1">{notif.date}</p>
+                    <DropdownMenuGroup>
+                      {notifications.map((notif, index) => (
+                        <div key={notif.id} className="px-2 py-2">
+                          <p className="text-sm font-medium text-white">{notif.type}</p>
+                          <p className="text-sm text-[#d4d4d8]">{notif.message}</p>
+                          <p className="text-xs text-[#71717a] mt-1">{notif.date}</p>
 
-                    {index !== notifications.length - 1 && (
-                      <DropdownMenuSeparator className="bg-secondary my-2" />
-                    )}
-                  </div>
-                ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                          {index !== notifications.length - 1 && (
+                            <DropdownMenuSeparator className="bg-secondary my-2" />
+                          )}
+                        </div>
+                      ))}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-          {/* Avatar */}
-          <Avatar className='w-10 h-10 border border-white cursor-pointer'>
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">
-              {'H'}
-            </div>
-            {/* <AvatarImage src='https://avatars.githubusercontent.com/u/140196543?v=4' /> */}
-          </Avatar>
-        </div>
-      </div>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverContent className="w-56 p-0 mt-2 " align="end">
+                    <Command className='bg-primary'>
+                      <CommandGroup heading="Harsh Vora" className="px-4 py-2 text-white" />
+                      <CommandSeparator className='bg-secondary' />
+                      <CommandGroup>
+                        <CommandItem className='text-white' onSelect={() => console.log("Settings clicked")}>
+                          Settings
+                        </CommandItem>
+                        <Separator className='bg-secondary' />
+                        <CommandItem className='text-white' onSelect={() => console.log("Dashboard clicked")}>
+                          Dashboard
+                        </CommandItem>
+                        <Separator className='bg-secondary' />
+                        <CommandItem className='text-white' onSelect={() => console.log("Analysis clicked")}>
+                          Analysis
+                        </CommandItem>
+                      </CommandGroup>
+                      <CommandSeparator className='bg-secondary' />
+                      <CommandItem
+                        className="text-red-600 hover:bg-red-100"
+                        onSelect={() => setConfirmLogout(true)}
+                      >
+                        Logout
+                      </CommandItem>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div > */}
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={confirmLogout} onOpenChange={setConfirmLogout}>
+        <DialogContent className='bg-primary'>
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to log out?</p>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setConfirmLogout(false)} className='text-black'>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={_ => AsyncFetcher({
+              url: '/logout',
+              cb: (data) => { setConfirmLogout(false); setAccessToken(data.accessToken) }
+            })}>
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
       {/* Content */}
-      <div className='fixed top-[7vh] left-[10vw] w-[90vw] h-[93vh] grid place-items-center'>
+      < div className='fixed top-0 left-[10vw] w-[90vw] h-screen grid place-items-center' >
         <Outlet />
-      </div>
+      </div >
     </div >
   )
 }

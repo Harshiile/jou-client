@@ -8,7 +8,9 @@ import { Separator } from '../../../components/ui/separator'
 import { Link } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
 import { useAccessToken } from '../../../context/acsTkn'
+import { useUser } from '../../../context/user'
 import { Input } from '../../../components/ui/input'
+import Loader from '../../../components/loader'
 import VideoCard, { convertViews } from './VideoCard'
 import { useEffect, useState } from 'react'
 import { AsyncFetcher } from '../../../lib/Fetcher'
@@ -21,8 +23,9 @@ const channel = {
 }
 
 
-export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFilterVideos, channel }) {
+export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFilterVideos, channel }) => {
     const [accessToken, setAccessToken] = useAccessToken()
+    const [user] = useUser()
     const [filterParams, setFilterParams] = useState({
         views: false,
         time: false,
@@ -77,17 +80,21 @@ export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFil
                                 <p className="text-sm text-muted-foreground">{channel.userHandle} • {convertViews(channel.subscribers.toString())} subscribers</p>
                             </div>
                         </div>
-                        <div>
-                            <Button
-                                className='bg-white hover:cursor-pointer text-black hover:bg-white font-bold text-md w-max'
-                                onClick={_ => AsyncFetcher({
-                                    url: `/service/generate-link?ws=${channel.id}`,
-                                    cb: ({ data }) => console.log(data?.link),
-                                    accessToken,
-                                    setAccessToken
-                                })}
-                            >Generate Link</Button>
-                        </div>
+                        {
+                            user.userType == 'youtuber' &&
+                            <div>
+                                <Button
+                                    className='bg-white hover:cursor-pointer text-black hover:bg-white font-bold text-md w-max'
+                                    onClick={_ => AsyncFetcher({
+                                        url: `/service/generate-link?ws=${channel.id}`,
+                                        cb: ({ data }) => console.log(data?.link),
+                                        accessToken,
+                                        setAccessToken
+                                    })}
+                                >Generate Link</Button>
+                            </div>
+                        }
+
                     </div>
                 </DrawerHeader>
                 <div className="overflow-auto p-6">
@@ -190,16 +197,7 @@ export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFil
 
                                 </>
                                 :
-                                <div className="gap-4 w-full flex items-center justify-center absolute top-1/2">
-                                    <div
-                                        className="w-15 h-15 border-4 border-transparent text-4xl animate-spin flex items-center justify-center border-t-white/20 rounded-full"
-                                    >
-                                        <div
-                                            className="w-11 h-11 border-4 border-transparent text-2xl animate-spin flex items-center justify-center border-t-secondary rounded-full"
-                                        >
-                                        </div>
-                                    </div>
-                                </div>
+                                <Loader className={'absolute top-1/2'} />
 
                         }
                     </div>

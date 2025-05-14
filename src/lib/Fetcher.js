@@ -1,8 +1,6 @@
 import { toast } from "sonner"
 
 export const AsyncFetcher = async ({ url, cb, methodType, bodyData, accessToken, setAccessToken }) => {
-    console.log('While Fecting : ', accessToken);
-
     const fetchOptions = methodType == 'POST' ?
         {
             method: 'POST',

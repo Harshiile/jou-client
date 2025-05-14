@@ -4,18 +4,39 @@ import { App, Dashboard, Info, JoinWS, Layout, Login, Upload } from '../src/page
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ContextProvider from './context/Context'
 import { Toaster } from "sonner"
+import { AuthMiddleWare } from './middleware/auth'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ContextProvider>
       <Routes>
         <Route path='/' element={<App />} />
-        <Route path='/get/youtube/info' element={<Info />} />
+        <Route path='/get/youtube/info' element={
+          <AuthMiddleWare>
+            <Info />
+          </AuthMiddleWare>}
+        />
         <Route path='/login' element={<Login />} />
-        <Route path='/join/workspace/:linkParams' element={<JoinWS />} />
-        <Route path='/' element={<Layout />}>
-          <Route path='upload' element={<Upload />} />
-          <Route path='dashboard' element={<Dashboard />} />
+        <Route path='/join/workspace/:linkParams' element={
+          <AuthMiddleWare>
+            <JoinWS />
+          </AuthMiddleWare>}
+        />
+        <Route path='/' element={
+          <AuthMiddleWare>
+            <Layout />
+          </AuthMiddleWare>
+        }>
+          <Route path='upload' element={
+            <AuthMiddleWare>
+              <Upload />
+            </AuthMiddleWare>
+          } />
+          <Route path='dashboard' element={
+            <AuthMiddleWare>
+              <Dashboard />
+            </AuthMiddleWare>
+          } />
         </Route>
       </Routes>
     </ContextProvider>
