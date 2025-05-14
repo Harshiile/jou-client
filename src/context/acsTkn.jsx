@@ -11,4 +11,4 @@ export const AccessTokenProvider = ({ children }) => {
     )
 }
 
-export const useChannels = () => useContext(accessTokenContext)
+export const useAccessToken = () => useContext(accessTokenContext)

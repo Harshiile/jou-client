@@ -13,13 +13,22 @@ import {
   SidebarProvider
 } from '../components/ui/sidebar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu'
-import { LayoutDashboard, Youtube, Bell, Video, Settings } from 'lucide-react'
+import { LayoutDashboard, Bell, Video, Settings } from 'lucide-react'
 import { Avatar, AvatarImage } from '../components/ui/avatar'
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import logo from '/logo.png'
 import { useEffect } from 'react'
+import { fetchMe } from '../lib/FetchMe'
+import { useUser } from "../context/user";
+import { useAccessToken } from "../context/acsTkn";
 
 const Layout = () => {
+  const [user, setUser] = useUser()
+  const [_, setAccessToken] = useAccessToken()
   const currentPath = useLocation()
+  useEffect(() => {
+    !user.id && fetchMe(setUser, setAccessToken)
+  }, [])
 
   return (
     <div>
@@ -28,7 +37,7 @@ const Layout = () => {
         <Sidebar className='w-[10vw] border-secondary'>
           <SidebarHeader className="bg-primary text-white border-b border-secondary pb-2 h-[7vh] flex justify-center">
             <div className="flex items-center gap-2 px-4 py-2">
-              <Youtube className="h-6 w-6 text-red-500" />
+              <img className="w-15 h-15" src={logo} />
               <span className="text-lg font-semibold">JOU</span>
             </div>
           </SidebarHeader>
@@ -104,7 +113,10 @@ const Layout = () => {
 
           {/* Avatar */}
           <Avatar className='w-10 h-10 border border-white cursor-pointer'>
-            <AvatarImage src='https://avatars.githubusercontent.com/u/140196543?v=4' />
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">
+              {'H'}
+            </div>
+            {/* <AvatarImage src='https://avatars.githubusercontent.com/u/140196543?v=4' /> */}
           </Avatar>
         </div>
       </div>

@@ -3,6 +3,7 @@ import Dashboard from "./Dashboard/Dashboard"
 import Login from "./Login/Login"
 import Layout from "./Layout"
 import Upload from "./Upload/Upload"
+import JoinWS from './JoinWs/JoinWS'
 import Info from './Info/Info'
 
 export {
@@ -11,5 +12,6 @@ export {
     Upload,
     Dashboard,
     Layout,
-    Info
+    Info,
+    JoinWS
 }

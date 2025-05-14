@@ -4,14 +4,19 @@ import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Separator } from '../../components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
+import { Switch } from '../../components/ui/switch';
 import { ScrollArea } from '../../components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { toast } from "sonner";
 import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { socket } from '../../socket';
-import FIleInfo from './components/FIleInfo';
+import { useAccessToken } from '../../context/acsTkn';
+import FileInfo from './components/FileInfo';
 import { Schedule } from './components/Schedule';
+import { fetchMe } from '../../lib/FetchMe';
+import { useNavigate } from 'react-router-dom';
 
 const fadeIn = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -19,8 +24,25 @@ const fadeIn = {
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
+const convertDurationIntoYTTimeFormat = (seconds) => {
+    const totalSeconds = Math.floor(seconds);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+
+    let duration = 'PT';
+    if (hours > 0) duration += hours + 'H';
+    if (minutes > 0) duration += minutes + 'M';
+    if (secs > 0 || (hours === 0 && minutes === 0)) duration += secs + 'S';
+
+    return duration;
+}
+
 const Upload = () => {
+    const navigate = useNavigate()
     const [file, setFile] = useState(null);
+    const [thumbnailFile, setThumbnailFile] = useState(null);
     const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
     const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(null);
     const videoInputRef = useRef(null);
@@ -29,13 +51,26 @@ const Upload = () => {
     const [progress, setProgress] = useState(0);
     const [title, setTitle] = useState('');
     const [videoType, setVideoType] = useState('');
-    const [date, setDate] = useState(new Date());
+    const [duration, setDuration] = useState(null)
+    const [isMadeForKids, setIsMadeForKids] = useState(null)
+    const [date, setDate] = useState(null);
+    const [isSchedule, setIsSchedule] = useState(false)
     const [desc, setDesc] = useState('');
+    const [isThumbnail, setIsThumbnail] = useState(false)
+
+    const [accessToken] = useAccessToken()
 
     useEffect(() => {
+        // fetchMe()
+        socket.connect()
         socket.on('uploading-progress', ({ percentage }) => setProgress(percentage));
         return () => socket.off('uploading-progress');
     }, []);
+
+    useEffect(() => {
+        isSchedule ? setDate(new Date()) : setDate(null)
+    }, [isSchedule])
+
 
     const handleVideoChange = (e) => {
         if (e.target.files?.length) {
@@ -48,28 +83,73 @@ const Upload = () => {
     const handleThumbnailChange = (e) => {
         if (e.target.files?.length) {
             const selectedFile = e.target.files[0];
+            setThumbnailFile(selectedFile)
             setThumbnailPreviewUrl(URL.createObjectURL(selectedFile));
         }
     };
 
     const handleUpload = (e) => {
         e.preventDefault();
-        if (!file) return toast.error("Please select a video first.");
-        console.log({ title, desc, date, videoType });
+
+        if (!title) return toast.error("Title is required");
+        if (!videoType) return toast.error("Type of Video is required");
+        if (!isMadeForKids) return toast.error("Audience Type is required");
+        if (thumbnailFile && thumbnailFile.size >= 2097152) return toast.error("Thumbnail size must be under 2 MB");
+        if (!file) return toast.error("Please select a video first");
+
+        const files = {
+            video: file,
+            thumbnail: thumbnailFile
+        }
+
+        const formData = new FormData();
+        formData.append('title', title)
+        formData.append('desc', desc === '' ? null : desc)
+        formData.append('duration', duration)
+        formData.append('videoType', videoType)
+        formData.append('isMadeForKids', isMadeForKids)
+        formData.append('willUploadAt', date)
+        formData.append('editor', 'b8162480-15e2-4480-b087-aa1016c4bd8c')
+        formData.append('workspace', 'UCHZ0UZ7PTrabekn_r-owSZg')
+        formData.append('video', files.video)
+        formData.append('thumbnail', files.thumbnail)
+
+
+        setIsUploading(true)
+        if (socket.id) {
+            fetch(`${import.meta.env.VITE_BACKEND_URL}/api/drive/upload`, {
+                method: 'POST',
+                body: formData,
+                credentials: "include",
+                headers: {
+                    'socket': socket.id,
+                    'authorization': `Bearer ${accessToken}`
+                }
+            })
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res)
+                    setIsUploading(false);
+                    toast.success(res.message)
+                    // navigate('/dashboard')
+                })
+        }
+        else {
+            console.log('Wait for socket initialized');
+        }
     };
 
     return (
-        <div className='w-full h-full px-8 bg-primary text-[#e3e3e3] shadow-xl flex flex-col'>
+        <div className='w-full h-full px-8 bg-primary text-[#e3e3e3] shadow-xl flex flex-col overflow-y-auto '>
 
             {/* Upload Title */}
-            <p className='text-3xl font-bold text-center py-3 mb-4' >Upload Video</p>
+            <p className='text-3xl font-bold text-center py-3 mb-4 tracking-tight' >Upload Video</p>
 
             {/* Upload Section */}
             <div className='flex'>
-
                 {/* Left Section */}
-                <ScrollArea className="h-[100vh] flex flex-col gap-y-6 flex-1">
-                    <form formEncType="multipart/form-data" onSubmit={handleUpload} className='flex flex-col gap-y-6'>
+                <ScrollArea className="flex flex-col gap-y-6 flex-1">
+                    <form formEncType="multipart/form-data" onSubmit={handleUpload} className='flex flex-col gap-y-6 scroll-auto'>
 
                         <div className='flex flex-col gap-y-4'>
                             <div>
@@ -78,54 +158,105 @@ const Upload = () => {
                             </div>
 
                             <div>
-                                <Label htmlFor='title' className='text-md mb-2'>Description</Label>
-                                <Textarea className='border border-secondary' placeholder='Video Description' value={desc} onChange={e => setDesc(e.target.value)} />
+                                <Label htmlFor='desc' className='text-md mb-2'>Description</Label>
+                                <Textarea id='desc' className='border border-secondary max-w-[40vw] min-h-[120px] w-full resize-y rounded-md p-2 bg-transparent' placeholder='Video Description' value={desc} onChange={e => setDesc(e.target.value)} />
                             </div>
 
-                            <div>
-                                <Label htmlFor='title' className='text-md mb-2'>Schedule</Label>
-                                <Schedule date={date} setDate={setDate} />
+                            <div className="flex items-center space-x-2">
+                                <Switch id="scheduleOfUploading" className='data-[state=unchecked]:bg-secondary data-[state=checked]:bg-green-500 '
+                                    checked={isSchedule}
+                                    onCheckedChange={setIsSchedule}
+                                />
+                                <Label htmlFor="scheduleOfUploading" className='text-md'>Schedule Of Uploading</Label>
                             </div>
+                            {
+                                isSchedule &&
+                                <div>
+                                    <Label htmlFor='schedule' className='text-md mb-2'>Schedule</Label>
+                                    <Schedule id='schedule' date={date} setDate={setDate} />
+                                </div>
+                            }
 
                             <div>
-                                <Label className='text-md mb-2'>Video Type</Label>
-                                <Select onValueChange={setVideoType}>
+                                <Label htmlFor='videoType' className='text-md mb-2'>Video Type</Label>
+                                <Select id="videoType" onValueChange={setVideoType}>
                                     <SelectTrigger className='w-full border border-secondary'>
                                         <SelectValue placeholder='Select Type' />
                                     </SelectTrigger>
                                     <SelectContent className='bg-primary text-[#e3e3e3]'>
-                                        <SelectItem value='0'>Public</SelectItem>
-                                        <SelectItem value='1'>Private</SelectItem>
-                                        <SelectItem value='2'>Unlisted</SelectItem>
+                                        <SelectItem value='public'>Public</SelectItem>
+                                        <SelectItem value='private'>Private</SelectItem>
+                                        <SelectItem value='unlisted'>Unlisted</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
-
-                            {/* Thumbnail */}
                             <div>
-                                <Label htmlFor='thumbnail' className='text-md mb-2'>Thumbnail</Label>
-                                <input hidden id='thumbnail' type='file' accept='image/*' ref={thumbnailInputRef} onChange={handleThumbnailChange} />
-
-                                <AnimatePresence>
-                                    {!thumbnailPreviewUrl ? (
-                                        <motion.div
-                                            className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
-                                            onClick={() => thumbnailInputRef.current?.click()}
-                                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                                        >
-                                            <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
-                                            <p className='text-md text-[#d4d4d8]'>Click to upload thumbnail</p>
-                                            <p className='text-xs text-[#71717a]'>JPG, PNG, or WEBP</p>
-                                        </motion.div>
-                                    ) : (
-                                        <motion.img
-                                            src={thumbnailPreviewUrl}
-                                            className='rounded-xl border border-secondary shadow-lg max-h-[30vh] w-full object-contain'
-                                            variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                <Label htmlFor='isMadeForKids' className='text-md mb-2'>Audience</Label>
+                                <RadioGroup id='isMadeForKids' className='ml-3'>
+                                    <div className='flex gap-x-3'>
+                                        <RadioGroupItem value='false' id='notMadeForKids'
+                                            className='data-[state=checked]:bg-white'
+                                            onClick={_ => setIsMadeForKids(null)}
                                         />
-                                    )}
-                                </AnimatePresence>
+                                        <Label htmlFor='notMadeForKids'>No, Not Made For Kids</Label>
+                                    </div>
+                                    <div className='flex gap-x-3'>
+                                        <RadioGroupItem value='true' id='madeForKids'
+                                            className='data-[state=checked]:bg-white'
+                                            onClick={_ => setIsMadeForKids(true)}
+                                        />
+                                        <Label htmlFor='madeForKids'>Yes, Made For Kids</Label>
+                                    </div>
+                                </RadioGroup>
                             </div>
+
+                            <div className="flex items-center space-x-2">
+                                <Switch id="customThumbnail" className='data-[state=unchecked]:bg-secondary data-[state=checked]:bg-green-500 '
+                                    checked={isThumbnail}
+                                    onCheckedChange={setIsThumbnail}
+                                />
+                                <Label htmlFor="customThumbnail" className='text-md '>Custom Thumbnail</Label>
+                            </div>
+                            {/* Thumbnail */}
+                            {
+                                isThumbnail &&
+                                <div>
+                                    <Label htmlFor='thumbnail' className='text-md mb-2'>Thumbnail</Label>
+                                    <input hidden id='thumbnail' type='file' accept='image/*' ref={thumbnailInputRef} onChange={handleThumbnailChange} />
+
+                                    <AnimatePresence>
+                                        {!thumbnailPreviewUrl ? (
+                                            <motion.div
+                                                className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
+                                                onClick={() => thumbnailInputRef.current?.click()}
+                                                variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                            >
+                                                <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
+                                                <p className='text-md text-[#d4d4d8]'>Click to upload thumbnail</p>
+                                                <p className='text-xs text-[#71717a]'>JPG, PNG, or WEBP</p>
+                                            </motion.div>
+                                        ) : (
+                                            <>
+                                                <motion.img
+                                                    src={thumbnailPreviewUrl}
+                                                    className='rounded-xl border border-secondary shadow-lg max-h-[30vh] w-full object-contain'
+                                                    variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                                />
+                                                <AnimatePresence>
+                                                    {thumbnailFile && (
+                                                        <FileInfo
+                                                            file={thumbnailFile}
+                                                            setFile={setThumbnailFile}
+                                                            setVideoPreviewUrl={setThumbnailPreviewUrl}
+                                                            type={'thumbnail'}
+                                                        />
+                                                    )}
+                                                </AnimatePresence>
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            }
                         </div>
 
                         {/* Upload Button */}
@@ -160,13 +291,19 @@ const Upload = () => {
                                     disableRemotePlayback
                                     className='rounded-xl border border-secondary shadow-lg mb-3 w-full'
                                     variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                    onLoadedData={e => setDuration(convertDurationIntoYTTimeFormat(e.target.duration))}
                                 />
                             )}
                         </AnimatePresence>
 
                         <AnimatePresence>
                             {file && (
-                                <FIleInfo file={file} setFile={setFile} setVideoPreviewUrl={setVideoPreviewUrl} />
+                                <FileInfo
+                                    file={file}
+                                    setFile={setFile}
+                                    setVideoPreviewUrl={setVideoPreviewUrl}
+                                    type={'video'}
+                                />
                             )}
                         </AnimatePresence>
                     </div>

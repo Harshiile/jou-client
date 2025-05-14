@@ -3,13 +3,15 @@
 import { Clock, Eye, Video, ArrowUpDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Drawer, DrawerContent, DrawerHeader } from "../../../components/ui/drawer"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu"
 import { Separator } from '../../../components/ui/separator'
 import { Link } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
+import { useAccessToken } from '../../../context/acsTkn'
 import { Input } from '../../../components/ui/input'
-import VideoCard from './VideoCard'
+import VideoCard, { convertViews } from './VideoCard'
 import { useEffect, useState } from 'react'
+import { AsyncFetcher } from '../../../lib/Fetcher'
 
 const channel = {
     name: "Tech Explorer",
@@ -19,7 +21,8 @@ const channel = {
 }
 
 
-export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFilterVideos }) {
+export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFilterVideos, channel }) {
+    const [accessToken, setAccessToken] = useAccessToken()
     const [filterParams, setFilterParams] = useState({
         views: false,
         time: false,
@@ -62,15 +65,28 @@ export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFil
     return (
         <Drawer open={open} onOpenChange={onOpenChange} direction="bottom" className='border-none'>
             <DrawerContent className="h-[80vh] w-screen border-none bg-primary">
-                <DrawerHeader className="border-b border-border/40 px-6 py-4 bg-primary">
-                    <div className="flex items-center gap-4">
-                        <Avatar className="h-12 w-12">
-                            <AvatarImage src={channel.avatar || "/placeholder.svg"} alt={channel.name} />
-                            <AvatarFallback>{channel.name.substring(0, 2)}</AvatarFallback>
-                        </Avatar>
+                <DrawerHeader>
+                    <div className='flex items-center justify-between border-b border-border/40 px-6 py-4 bg-primary'>
+                        <div className="flex items-center gap-4 w-max">
+                            <Avatar className="h-12 w-12">
+                                <AvatarImage src={channel.avatar || "/placeholder.svg"} alt={channel.name} />
+                                <AvatarFallback>{channel.name.substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <h2 className="text-xl font-bold">{channel.name}</h2>
+                                <p className="text-sm text-muted-foreground">{channel.userHandle} • {convertViews(channel.subscribers.toString())} subscribers</p>
+                            </div>
+                        </div>
                         <div>
-                            <h2 className="text-xl font-bold">{channel.name}</h2>
-                            <p className="text-sm text-muted-foreground">{channel.handle} • {channel.subscribers} subscribers</p>
+                            <Button
+                                className='bg-white hover:cursor-pointer text-black hover:bg-white font-bold text-md w-max'
+                                onClick={_ => AsyncFetcher({
+                                    url: `/service/generate-link?ws=${channel.id}`,
+                                    cb: ({ data }) => console.log(data?.link),
+                                    accessToken,
+                                    setAccessToken
+                                })}
+                            >Generate Link</Button>
                         </div>
                     </div>
                 </DrawerHeader>
@@ -161,12 +177,17 @@ export function ChannelDrawer({ open, onOpenChange, videos, filterVideos, setFil
                         {
                             filterVideos != null ?
                                 <>
-                                    {filterVideos.map((video) => (
-                                        <>
-                                            <VideoCard video={video} />
-                                            <Separator className='bg-secondary' />
-                                        </>
-                                    ))}
+                                    {filterVideos.length > 0 ?
+                                        filterVideos.map((video) => (
+                                            <>
+                                                <VideoCard video={video} />
+                                                <Separator className='bg-secondary' />
+                                            </>
+                                        ))
+                                        :
+                                        <p>Workspace not contain any video</p>
+                                    }
+
                                 </>
                                 :
                                 <div className="gap-4 w-full flex items-center justify-center absolute top-1/2">

@@ -14,7 +14,7 @@ const UploaderDrawer = ({ isUploading, setIsUploading, progress }) => {
       <input
         type='submit'
         value='Upload'
-        className='w-full bg-white text-black px-2 py-2 rounded-md mt-4 font-semibold'
+        className='w-full bg-white text-black px-2 py-2 rounded-md mt-4 font-semibold mb-8'
       />
       <DrawerContent className='bg-primary w-[55%] mx-auto flex flex-col gap-y-4'>
         <div className='flex justify-between px-20 items-center text-center text-white text-xl mb-2'>

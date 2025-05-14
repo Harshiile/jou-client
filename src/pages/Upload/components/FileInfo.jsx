@@ -8,19 +8,19 @@ const fadeSlide = {
     exit: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2 } },
 };
 
-const FileInfo = ({ file, setFile, setVideoPreviewUrl }) => {
+const FileInfo = ({ file, setFile, setVideoPreviewUrl, type }) => {
     return (
         <motion.div
             variants={fadeSlide}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className='relative bg-[#18181b] border border-secondary rounded-xl p-4 shadow-md flex items-center gap-4 text-sm text-[#d4d4d8]'
+            className='relative bg-[#18181b] border border-secondary rounded-xl p-4 shadow-md flex items-center gap-4 text-sm text-[#d4d4d8] mt-4'
         >
             <FileText className='w-10 h-10 text-white' />
             <div className='flex flex-col gap-1'>
                 <p className='text-md font-medium text-[#f4f4f5]'>{file.name}</p>
-                <p className='text-xs text-white font-medium'>Size: {(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                <p className={`text-xs font-medium ${(type == 'thumbnail' && file.size >= 2097152) ? 'text-red-500' : 'text-white'}`}>Size: {(file.size / (1024 * 1024)).toFixed(2)} MB</p>
             </div>
 
             <X

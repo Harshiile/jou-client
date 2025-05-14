@@ -1,7 +1,7 @@
 import { Clock, Eye } from 'lucide-react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
+import { Duration } from 'luxon'
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -42,11 +42,11 @@ const getStatusLabel = (status) => {
     }
 }
 
-const convertViews = (views) => {
-    const vLength = views.length
+export const convertViews = (views) => {
+    const vLength = views?.length
     if (vLength < 4) return views;
-    if (vLength >= 4 && vLength <= 6) return `${(views / 1000).toFixed(1)} K`;
-    if (vLength >= 7 && vLength <= 9) return `${(views / 1000000).toFixed(1)} M`;
+    if (vLength >= 4 && vLength <= 6) return `${(views / 1000).toFixed(views >= 1000 ? 0 : 1)} K`;
+    if (vLength >= 7 && vLength <= 9) return `${(views / 1000000).toFixed(views >= 1000000 ? 0 : 1)} M`;
     if (vLength >= 10) return `${(views / 1000000000).toFixed(1)} B`;
 }
 
@@ -80,19 +80,16 @@ const convertDate = (date) => {
     return new Date(date).toLocaleString(undefined, options);
 }
 
+const convertTime = (duration) => {
+    let formattedDuration = ' ';
+    const dur = Duration.fromISO(duration);
+    if (dur.hours > 0) formattedDuration += `${dur.hours.toString()}:`
+    if (dur.minutes > 0) formattedDuration += `${dur.minutes.toString()}:`
+    if (dur.seconds > 0) formattedDuration += `${dur.seconds.toString()}`
+    return formattedDuration
+}
+
 const VideoCard = ({ video, userType, forUse }) => {
-    /*
-        id
-        url
-        status
-        thumbnail
-        title
-        duration
-        videoType
-        views
-        date
-        channel {name, userHandle}
-    */
     return (
         <Link
             key={video.id}
@@ -104,17 +101,16 @@ const VideoCard = ({ video, userType, forUse }) => {
             <div className="flex items-start gap-x-4 flex-1">
                 <div className="relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md bg-muted">
                     <img
-                        src={video.thumbnail || "/placeholder.svg"}
+                        src={video.thumbnail}
                         alt={video.title}
                         className="h-full w-full object-cover rounded-md"
                     />
                     {video.duration && (
                         <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
-                            {video.duration}
+                            {convertTime(video.duration)}
                         </span>
                     )}
                 </div>
-
                 <div className="flex flex-col justify-between flex-1 gap-y-1">
 
                     {/* Video Title & Type */}
@@ -158,6 +154,7 @@ const VideoCard = ({ video, userType, forUse }) => {
                                 </div>
                             </div>
                             :
+                            video.uploadAt &&
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                 <Clock className="h-3.5 w-3.5" />
                                 <span>Scheduled to upload on {convertDate(video.uploadAt)}</span>
