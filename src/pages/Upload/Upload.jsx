@@ -13,9 +13,9 @@ import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { socket } from '../../socket';
 import { useAccessToken } from '../../context/acsTkn';
+import { useUser } from '../../context/user';
 import FileInfo from './components/FileInfo';
 import { Schedule } from './components/Schedule';
-import { fetchMe } from '../../lib/FetchMe';
 import { useNavigate } from 'react-router-dom';
 
 const fadeIn = {
@@ -59,9 +59,9 @@ const Upload = () => {
     const [isThumbnail, setIsThumbnail] = useState(false)
 
     const [accessToken] = useAccessToken()
+    const [user] = useUser()
 
     useEffect(() => {
-        // fetchMe()
         socket.connect()
         socket.on('uploading-progress', ({ percentage }) => setProgress(percentage));
         return () => socket.off('uploading-progress');
@@ -273,15 +273,22 @@ const Upload = () => {
                         <input hidden id='file' type='file' accept='video/*' ref={videoInputRef} onChange={handleVideoChange} />
                         <AnimatePresence>
                             {!videoPreviewUrl ? (
-                                <motion.div
-                                    className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
-                                    onClick={() => videoInputRef.current?.click()}
-                                    variants={fadeIn} initial='hidden' animate='visible' exit='exit'
-                                >
-                                    <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
-                                    <p className='text-md text-[#d4d4d8]'>Click to upload video</p>
-                                    <p className='text-xs text-[#71717a]'>MP4, WebM, or MOV</p>
-                                </motion.div>
+
+                                <div>
+                                    <motion.div
+                                        className='flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-[#3f3f46] rounded-xl cursor-pointer hover:bg-[#1f1f25] transition duration-300'
+                                        onClick={() => videoInputRef.current?.click()}
+                                        variants={fadeIn} initial='hidden' animate='visible' exit='exit'
+                                    >
+                                        <UploadCloud className='w-12 h-12 text-[#a1a1aa]' />
+                                        <p className='text-md text-[#d4d4d8]'>Click to upload video</p>
+                                        <p className='text-xs text-[#71717a]'>MP4, WebM, or MOV</p>
+                                    </motion.div>
+
+                                    <p>{user.id}</p>
+                                    <p>{user.name}</p>
+                                    <p>{user.userType}</p>
+                                </div>
                             ) : (
                                 <motion.video
                                     src={videoPreviewUrl}

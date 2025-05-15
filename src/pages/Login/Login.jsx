@@ -15,14 +15,12 @@ import {
 import { AsyncFetcher } from '../../lib/Fetcher';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUser } from '../../context/user';
-import { useAccessToken } from '../../context/acsTkn';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const navigate = useNavigate()
     const [isLogin, setIsLogin] = useState(true)
     const [_, setUser] = useUser()
-    const [__, setAccessToken] = useAccessToken()
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [role, setRole] = useState('')
@@ -106,13 +104,9 @@ const Login = () => {
                         methodType: 'POST',
                         bodyData: isLogin ? { email, password } : { email, password, userType: role, name },
                         cb: ({ message, data }) => {
-                            console.log(data);
-
                             setUser(data.userData);
-                            setAccessToken(data.accessToken)
-                            console.log('acsTkn : ', data.accessToken);
                             toast.success(message);
-                            navigate('/dashboard')
+                            navigate('/upload')
                         }
                     })
 

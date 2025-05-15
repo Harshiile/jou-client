@@ -27,13 +27,13 @@ import { AsyncFetcher } from '../lib/Fetcher'
 
 const Layout = () => {
   const [user, setUser] = useUser()
-  const [_, setAccessToken] = useAccessToken()
+  const [accessToken, setAccessToken] = useAccessToken()
   const currentPath = useLocation()
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const buttonRef = useRef()
   useEffect(() => {
-    // !user.id && fetchMe(setUser, setAccessToken)
+    !user.id && fetchMe(setUser, accessToken, setAccessToken)
   }, [])
 
 

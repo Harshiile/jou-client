@@ -1,8 +1,11 @@
 import { AsyncFetcher } from "./Fetcher";
 
-export const fetchMe = (setUser, setAccessToken) => {
+export const fetchMe = (setUser, accessToken, setAccessToken) => {
     AsyncFetcher({
-        url: '/get/fetch-me',
-        cb: ({ data }) => { console.log(data); setUser(data.userData); setAccessToken(data.accessToken) }
+        url: `/get/fetch-me`,
+        cb: ({ data }) => {
+            console.log('user-fetch : ', data.userData.id);
+            setUser(data.userData);
+        },
     })
 }
