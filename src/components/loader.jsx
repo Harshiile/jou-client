@@ -9,7 +9,7 @@ const dotTransition = {
 
 const Loader = ({ className }) => {
     return (
-        <div className={`flex items-center justify-center gap-1${className}`}>
+        <div className={`flex items-center justify-center gap-1 ${className}`}>
             {[0, 1, 2].map((index) => (
                 <motion.span
                     key={index}

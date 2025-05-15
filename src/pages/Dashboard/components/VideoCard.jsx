@@ -1,7 +1,8 @@
 import { Clock, Eye } from 'lucide-react'
 import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Duration } from 'luxon'
+import { Button } from '../../../components/ui/button'
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -90,6 +91,7 @@ const convertTime = (duration) => {
 }
 
 const VideoCard = ({ video, userType, forUse }) => {
+    const navigate = useNavigate()
     return (
         <Link
             key={video.id}
@@ -172,11 +174,19 @@ const VideoCard = ({ video, userType, forUse }) => {
                     <p className="font-bold text-md">@{video.editor}</p>
                 </span>
                 <span
-                    className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
+                    className={`text-xs rounded-md px-3 py-2 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
                 >
                     <Clock className="w-4 h-4" />
                     <p className="font-bold text-md">{getStatusLabel(video.status)}</p>
                 </span>
+                {
+                    (userType == 'youtuber' && video.status == 'reviewPending')
+                    &&
+                    <Button
+                        onClick={_ => navigate('/review')}
+                        className='bg-white text-black hover:bg-white/80 hover:text-black hover:cursor-pointer'
+                    >Review</Button>
+                }
             </div>
         </Link >
     )

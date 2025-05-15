@@ -13,20 +13,20 @@ import {
   SidebarProvider
 } from '../components/ui/sidebar'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog'
-import { LayoutDashboard, LogOut, Video, Settings } from 'lucide-react'
+import { LayoutDashboard, LogOut, Video, Settings, Star } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import logo from '/logo.png'
 import { useEffect } from 'react'
 import { fetchMe } from '../lib/FetchMe'
 import { useUser } from "../context/user";
 import { useAccessToken } from "../context/acsTkn";
-import { Separator } from '../components/ui/separator'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AsyncFetcher } from '../lib/Fetcher'
 
 const Layout = () => {
   const [user, setUser] = useUser()
+  const navigate = useNavigate()
   const [accessToken, setAccessToken] = useAccessToken()
   const currentPath = useLocation()
   const [open, setOpen] = useState(false);
@@ -54,14 +54,18 @@ const Layout = () => {
               <SidebarGroupLabel className='text-white mb-3'>OVERVIEW</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <Link to='/upload'>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton isActive={currentPath.pathname == '/upload'}>
-                        <Video className="h-4 w-4" />
-                        <span>Upload</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </Link>
+                  {
+                    user.userType == 'editor' &&
+                    <Link to='/upload'>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton isActive={currentPath.pathname == '/upload'}>
+                          <Video className="h-4 w-4" />
+                          <span>Upload</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </Link>
+                  }
+
                   <Link to='/dashboard'>
                     <SidebarMenuItem>
                       <SidebarMenuButton isActive={currentPath.pathname == '/dashboard'}>
@@ -70,6 +74,18 @@ const Layout = () => {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </Link>
+                  {
+                    user.userType == 'youtuber' &&
+                    <Link to='/review'>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton isActive={currentPath.pathname == '/review'}>
+                          <Star className="h-4 w-4" />
+                          <span>Review</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </Link>
+                  }
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -115,7 +131,7 @@ const Layout = () => {
                     className='flex gap-x-2 items-center'
                   >
                     <span className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer">H</span>
-                    <span className='text-md font-semibold hover:cursor-pointer'>Harshil</span>
+                    <span className='text-md font-semibold hover:cursor-pointer'>{user.name}</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -197,7 +213,7 @@ const Layout = () => {
             </Button>
             <Button variant="destructive" onClick={_ => AsyncFetcher({
               url: '/logout',
-              cb: (data) => { setConfirmLogout(false); setAccessToken(data.accessToken) }
+              cb: _ => { setConfirmLogout(false); navigate('/login') }
             })}>
               Logout
             </Button>

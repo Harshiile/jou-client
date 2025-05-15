@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Separator } from '../../../components/ui/separator'
 import { Link } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
-import { useAccessToken } from '../../../context/acsTkn'
+import { useVideos } from '../../../context/videos'
 import { useUser } from '../../../context/user'
 import { Input } from '../../../components/ui/input'
 import Loader from '../../../components/loader'
@@ -23,20 +23,26 @@ const channel = {
 }
 
 
-export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFilterVideos, channel }) => {
-    const [accessToken, setAccessToken] = useAccessToken()
+export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideos, channel }) => {
+    const [videos, setVideos] = useVideos()
     const [user] = useUser()
     const [filterParams, setFilterParams] = useState({
         views: false,
         time: false,
-        videoType: 'all',
-        status: 'all'
+        videoType: null,
+        status: null
     })
     const [isAscending, setIsAscending] = useState(true)
-    useEffect(() => {
-        // filterParams.status == 'all' ? setFilterVideos(videos) : setFilterVideos(videos.filter(video => video.status == filterParams.status))
 
-        // filterParams.videoType == 'all' ? setFilterVideos(videos) : setFilterVideos(videos.filter(video => video.videoType == filterParams.videoType))
+    useEffect(() => {
+        setFilterVideos(videos)
+    }, [])
+
+    useEffect(() => {
+
+        // filterParams.status == null ? setFilterVideos(videos) : setFilterVideos(videos.filter(video => video.status == filterParams.status))
+
+        // filterParams.videoType == null ? setFilterVideos(videos) : setFilterVideos(videos.filter(video => video.videoType == filterParams.videoType))
 
         // filterParams.views && setFilterVideos(videos.sort((a, b) => Number(a.views) - Number(b.views)))
     }, [filterParams])
@@ -51,14 +57,14 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
     const setVideoType = (videoType) => {
         setFilterParams(prev => ({
             ...prev,
-            videoType: videoType == prev.videoType ? 'all' : videoType
+            videoType: videoType == prev.videoType ? null : videoType
         }))
     }
 
     const setVideoStatus = (status) => {
         setFilterParams(prev => ({
             ...prev,
-            status: status == prev.status ? 'all' : status
+            status: status == prev.status ? null : status
         }))
     }
 
@@ -101,9 +107,12 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                     <div className='flex items-center justify-between mb-7'>
                         <h3 className="text-lg font-semibold ">Channel Videos</h3>
                         <div className='flex items-center gap-x-6'>
-                            <Link to='/upload'>
-                                <Button className='bg-white text-black font-bold cursor-pointer hover:bg-white'>New Upload</Button>
-                            </Link>
+                            {
+                                user.userType == 'editor' &&
+                                <Link to='/upload'>
+                                    <Button className='bg-white text-black font-bold cursor-pointer hover:bg-white'>New Upload</Button>
+                                </Link>
+                            }
 
 
                             <DropdownMenu>
@@ -130,19 +139,19 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                     <DropdownMenuGroup className='flex gap-x-3 justify-center'>
                                         <DropdownMenuItem
                                             onClick={() => setVideoType('public')}
-                                            className={`border border-secondary ${filterParams.visibility === 'public' ? 'bg-green-400 hover:bg-green-400' : ''}`}
+                                            className={`border border-secondary ${filterParams.videoType == 'public' ? 'bg-green-400 hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Public
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setVideoType('private')}
-                                            className={`border border-secondary ${filterParams.visibility === 'private' ? 'bg-green-400 hover:bg-green-400' : ''}`}
+                                            className={`border border-secondary ${filterParams.videoType == 'private' ? 'bg-green-400 hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Private
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setVideoType('unlisted')}
-                                            className={`border border-secondary ${filterParams.visibility === 'unlisted' ? 'bg-green-400 hover:bg-green-400' : ''}`}
+                                            className={`border border-secondary ${filterParams.videoType == 'unlisted' ? 'bg-green-400 hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Unlisted
                                         </DropdownMenuItem>
@@ -151,19 +160,19 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                     <DropdownMenuGroup className='flex justify-center gap-x-3'>
                                         <DropdownMenuItem
                                             onClick={() => setVideoStatus('reviewPending')}
-                                            className={`border border-secondary ${filterParams.time ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
+                                            className={`border border-secondary ${filterParams.status == 'reviewPending' ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Review Pending
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setVideoStatus('uploadPending')}
-                                            className={`border border-secondary ${filterParams.views ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
+                                            className={`border border-secondary ${filterParams.status == 'uploadPending' ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Uploading Pending
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setVideoStatus('uploaded')}
-                                            className={`border border-secondary ${filterParams.views ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
+                                            className={`border border-secondary ${filterParams.status == 'uploaded' ? 'bg-green-400 !hover:bg-green-400 text-black font-bold' : ''}`}
                                         >
                                             Uploaded
                                         </DropdownMenuItem>
@@ -187,7 +196,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                     {filterVideos.length > 0 ?
                                         filterVideos.map((video) => (
                                             <>
-                                                <VideoCard video={video} />
+                                                <VideoCard video={video} userType={user.userType} forUse={1} />
                                                 <Separator className='bg-secondary' />
                                             </>
                                         ))
@@ -197,7 +206,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
 
                                 </>
                                 :
-                                <Loader className={'absolute top-1/2'} />
+                                <Loader className={'absolute top-1/2 left-1/2'} />
 
                         }
                     </div>

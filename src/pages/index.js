@@ -5,6 +5,7 @@ import Layout from "./Layout"
 import Upload from "./Upload/Upload"
 import JoinWS from './JoinWs/JoinWS'
 import Info from './Info/Info'
+import Review from './Review/Review'
 
 export {
     App,
@@ -13,5 +14,6 @@ export {
     Dashboard,
     Layout,
     Info,
-    JoinWS
+    JoinWS,
+    Review
 }
