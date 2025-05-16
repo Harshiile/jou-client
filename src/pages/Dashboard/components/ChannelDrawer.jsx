@@ -15,13 +15,6 @@ import VideoCard, { convertViews } from './VideoCard'
 import { useEffect, useState } from 'react'
 import { AsyncFetcher } from '../../../lib/Fetcher'
 
-const channel = {
-    name: "Tech Explorer",
-    handle: "@techexplorer",
-    subscribers: "152K",
-    avatar: "https://robohash.org/techexplorer",
-}
-
 
 export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideos, channel }) => {
     const [videos, setVideos] = useVideos()
@@ -196,7 +189,11 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                     {filterVideos.length > 0 ?
                                         filterVideos.map((video) => (
                                             <>
-                                                <VideoCard video={video} userType={user.userType} forUse={1} />
+                                                <VideoCard
+                                                    video={video}
+                                                    userType={user.userType}
+                                                    channel={channel}
+                                                    forUse={1} />
                                                 <Separator className='bg-secondary' />
                                             </>
                                         ))

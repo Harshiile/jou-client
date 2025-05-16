@@ -1,8 +1,9 @@
 import { Clock, Eye } from 'lucide-react'
-import React, { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Duration } from 'luxon'
+import nonThumbnail from '/nonThumbnail.jpg'
 import { Button } from '../../../components/ui/button'
+import { AsyncFetcher } from '../../../lib/Fetcher'
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -90,7 +91,7 @@ const convertTime = (duration) => {
     return formattedDuration
 }
 
-const VideoCard = ({ video, userType, forUse }) => {
+const VideoCard = ({ video, userType, forUse, channel }) => {
     const navigate = useNavigate()
     return (
         <Link
@@ -101,9 +102,14 @@ const VideoCard = ({ video, userType, forUse }) => {
         >
             {/* Left Section */}
             <div className="flex items-start gap-x-4 flex-1">
-                <div className="relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                <div className="bg-transparent relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md">
                     <img
-                        src={video.thumbnail}
+                        src={
+                            video.thumbnail ?
+                                video.status != 'uploaded' ? `http://localhost:3000/api/get/stream/file?type=image&id=${video.thumbnail}` : video.thumbnail
+                                :
+                                nonThumbnail
+                        }
                         alt={video.title}
                         className="h-full w-full object-cover rounded-md"
                     />
@@ -183,7 +189,18 @@ const VideoCard = ({ video, userType, forUse }) => {
                     (userType == 'youtuber' && video.status == 'reviewPending')
                     &&
                     <Button
-                        onClick={_ => navigate('/review')}
+                        onClick={_ => AsyncFetcher({
+                            url: '/service/review-video-link',
+                            methodType: 'POST',
+                            bodyData: {
+                                channelName: channel.name,
+                                channelAvatar: channel.avatar,
+                                channelUserHandle: channel.userHandle,
+                                videoId: video.id,
+                                videoTitle: video.title
+                            },
+                            cb: ({ data }) => navigate(data.link)
+                        })}
                         className='bg-white text-black hover:bg-white/80 hover:text-black hover:cursor-pointer'
                     >Review</Button>
                 }

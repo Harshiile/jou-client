@@ -5,6 +5,7 @@ import Layout from "./Layout"
 import Upload from "./Upload/Upload"
 import JoinWS from './JoinWs/JoinWS'
 import Info from './Info/Info'
+import ReviewLink from './Review/ReviewLink'
 import Review from './Review/Review'
 
 export {
@@ -15,5 +16,6 @@ export {
     Layout,
     Info,
     JoinWS,
+    ReviewLink,
     Review
 }
