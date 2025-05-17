@@ -1,109 +1,103 @@
-import React, { useEffect, useState } from 'react'
-import { AsyncFetcher } from '../../lib/Fetcher'
-import { useUser } from '../../context/user'
-import { useAccessToken } from '../../context/acsTkn'
-import { useWorkSpaces } from '../../context/workspaces'
-import { useVideos } from '../../context/videos'
-import { ChannelDrawer } from './components/ChannelDrawer'
-import { convertViews } from './components/VideoCard'
-import Loader from '../../components/loader'
+import React, { useEffect, useState } from 'react';
+import { AsyncFetcher } from '../../lib/Fetcher';
+import { useUser } from '../../context/user';
+import { useAccessToken } from '../../context/acsTkn';
+import { useWorkSpaces } from '../../context/workspaces';
+import { useVideos } from '../../context/videos';
+import Calender from './components/Schedule/components/Calender'
+import { ChannelDrawer } from './components/ChannelDrawer';
+import { convertViews } from './components/VideoCard';
+import Loader from '../../components/loader';
+import { motion } from 'framer-motion';
+import PendingReviewVideos from './components/PendingReview';
 
 const Dashboard = () => {
-    const [user] = useUser()
-    const [accessToken, setAccessToken] = useAccessToken()
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-    const [videos, setVideos] = useVideos()
-    const [filterVideos, setFilterVideos] = useState()
-    const [recentVideos, setRecentVideos] = useState(null)
-    const [workSpaces, setWorkSpaces] = useWorkSpaces()
-    const [channel, setChannel] = useState(null)
+    const [user] = useUser();
+    const [accessToken, setAccessToken] = useAccessToken();
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [videos, setVideos] = useVideos();
+    const [filterVideos, setFilterVideos] = useState();
+    const [recentVideos, setRecentVideos] = useState(null);
+    const [workSpaces, setWorkSpaces] = useWorkSpaces();
+    const [channel, setChannel] = useState(null);
 
     useEffect(() => {
         if (user.id && !workSpaces) {
             AsyncFetcher({
                 url: `/get/workspaces?userId=${user.id}&role=${user.userType}`,
                 cb: ({ data }) => {
-                    console.log(data.workspaces);
                     setWorkSpaces(data.workspaces);
                 },
                 accessToken,
-                setAccessToken
-            })
+                setAccessToken,
+            });
         }
-    }, [user, workSpaces])
+    }, [user, workSpaces]);
 
     const fetchVideos = (wsId) => {
         AsyncFetcher({
             url: `/get/videos?workspace=${wsId}`,
             cb: ({ data }) => {
                 setVideos(data.metadata);
-                setFilterVideos(data.metadata)
+                setFilterVideos(data.metadata);
             },
-        })
-    }
+        });
+    };
 
     return (
-        <div className='flex flex-col gap-y-15 h-[90vh] mt-7'>
-            <ChannelDrawer
-                open={isDrawerOpen}
-                onOpenChange={setIsDrawerOpen}
-                filterVideos={filterVideos}
-                setFilterVideos={setFilterVideos}
-                channel={channel}
-            />
-            {/* Recent Activities Section */}
-            <div className={`w-[85vw] mx-auto flex flex-col justify-center border-2 border-secondary p-5 rounded-xl transition-all duration-500 ${!recentVideos ? 'border-[max-content] w-max items-center' : 'items-start'}`}>
-                <p className='text-xl font-bold mb-4'>Recent Activity</p>
-                {!recentVideos ? (
-                    <Loader />
-                ) : (
-                    <div className='mt-4 flex flex-col gap-y-3'>
-                        {/* Add the video mapping code here */}
-                    </div>
-                )}
+        <div className='flex flex-col items-center justify-center w-full h-full px-8 gap-y-6'>
+            <div className='w-full h-[50%] flex gap-x-6'>
+                <div className='w-[73%] border-2 border-secondary rounded-md p-4 ' >
+                    Pending Videos
+                    <PendingReviewVideos />
+                </div>
+                <div className='w-[27%] border-2 border-secondary rounded-md p-4 text-xl'>
+                    Schedule
+                    <Calender videos={tmpVideos} />
+                </div>
             </div>
-
-            {/* Workspaces Section */}
-            <div className={`w-[85vw] mx-auto flex flex-col justify-center border-2 border-secondary p-5 px-8 rounded-xl transition-all duration-500 ${!workSpaces ? 'border-[max-content] w-max items-center' : 'items-start '}`}>
-                <p className='text-xl font-bold mb-4'>WorkSpaces</p>
-                {!workSpaces ? (
-                    <Loader />
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {workSpaces.length <= 0 ?
-                            <p className='text-white'>Ready to Join a Team? No Workspaces Joined Yet</p>
-                            :
-                            workSpaces?.map(ws => (
-                                <div
-                                    key={ws.id}
-                                    className="border border-secondary bg-primary py-4 px-6 rounded-xl hover:shadow-lg transition-shadow duration-300"
-                                    onClick={e => {
-                                        setChannel(ws);
-                                        fetchVideos(ws.id);
-                                        setIsDrawerOpen(!isDrawerOpen);
-                                    }}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src={ws.avatar}
-                                            alt={ws.name}
-                                            className="w-12 h-12 rounded-full object-cover ring-2 ring-secondary"
-                                        />
-                                        <div className="flex flex-col">
-                                            <p className="font-semibold text-lg text-white">{ws.name}</p>
-                                            <p className='text-sm text-gray-400'>{ws.userHandle} • {convertViews(ws.subscribers?.toString())} Subscribers</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-
-                        }
-
-                    </div>
-                )}
+            <div className='w-full h-[40%] border-2 border-secondary rounded-md p-4'>
+                Workspaces
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Dashboard
+export default Dashboard;
+
+
+
+const tmpVideos = [
+    {
+        thumbnail: "https://i.ytimg.com/vi/TEBrs2QBgu0/maxresdefault.jpg",
+        status: "uploadPending",
+        uploadAt: "2025-06-01T10:00:00Z",
+        title: "Exploring the Hidden Gems of Bali",
+        videoType: "Public",
+        desc: "Embark on a journey through Bali's lesser-known treasures, from serene waterfalls to exquisite villas, offering a unique perspective of the island beyond its popular beaches."
+    },
+    {
+        thumbnail: "https://i.ytimg.com/vi/SqcY0GlETPk/maxresdefault.jpg",
+        status: "uploadPending",
+        uploadAt: "2025-06-02T12:30:00Z",
+        title: "React Tutorial for Beginners",
+        videoType: "Public",
+        desc: "A comprehensive guide for newcomers to React, this tutorial covers the fundamentals of building components and managing state, laying the groundwork for developing dynamic web applications."
+    },
+    {
+        thumbnail: "https://i.ytimg.com/vi/drJNofd3gtk/maxresdefault.jpg",
+        status: "uploadPending",
+        uploadAt: "2025-06-03T14:00:00Z",
+        title: "The iPhone 15 Pro Max is Unbeatable (Long Term Review)",
+        videoType: "Unlisted",
+        desc: "An in-depth analysis of the iPhone 15 Pro Max after extended use, highlighting its performance, camera capabilities, and overall user experience, providing insights into its long-term value."
+    },
+    {
+        thumbnail: "https://i.ytimg.com/vi/GMp7m7_EYg8/maxresdefault.jpg",
+        status: "uploadPending",
+        uploadAt: "2025-06-04T16:15:00Z",
+        title: "Funny Moments on MasterChef #2",
+        videoType: "Private",
+        desc: "A compilation of the most hilarious and unexpected moments from MasterChef, showcasing the lighter side of the intense culinary competition."
+    }
+];

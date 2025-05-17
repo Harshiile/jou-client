@@ -4,6 +4,7 @@ import { Duration } from 'luxon'
 import nonThumbnail from '/nonThumbnail.jpg'
 import { Button } from '../../../components/ui/button'
 import { AsyncFetcher } from '../../../lib/Fetcher'
+import { motion } from 'framer-motion'
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -85,72 +86,74 @@ const convertDate = (date) => {
 const convertTime = (duration) => {
     let formattedDuration = ' ';
     const dur = Duration.fromISO(duration);
-    if (dur.hours > 0) formattedDuration += `${dur.hours.toString()}:`
-    if (dur.minutes > 0) formattedDuration += `${dur.minutes.toString()}:`
-    if (dur.seconds > 0) formattedDuration += `${dur.seconds.toString()}`
+    if (dur.hours > 0) formattedDuration += dur.hours.toString()
+    if (dur.minutes > 0) formattedDuration += $dur.minutes.toString()
+    if (dur.seconds > 0) formattedDuration += $dur.seconds.toString()
     return formattedDuration
 }
 
 const VideoCard = ({ video, userType, forUse, channel }) => {
-    const navigate = useNavigate()
-    return (
-        <Link
-            key={video.id}
-            to={video?.url}
-            onClick={e => video.status !== 'uploaded' && e.preventDefault()}
-            className={`flex items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow hover:shadow-lg text-white cursor-auto ${forUse == 0 && 'p-3'}`}
-        >
-            {/* Left Section */}
-            <div className="flex items-start gap-x-4 flex-1">
-                <div className="bg-transparent relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md">
-                    <img
-                        src={
-                            video.thumbnail ?
-                                video.status != 'uploaded' ? `http://localhost:3000/api/get/stream/file?type=image&id=${video.thumbnail}` : video.thumbnail
-                                :
-                                nonThumbnail
-                        }
-                        alt={video.title}
-                        className="h-full w-full object-cover rounded-md"
-                    />
-                    {video.duration && (
-                        <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
-                            {convertTime(video.duration)}
-                        </span>
-                    )}
-                </div>
-                <div className="flex flex-col justify-between flex-1 gap-y-1">
+    const navigate = useNavigate();
 
-                    {/* Video Title & Type */}
-                    <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold line-clamp-2">{video.title}</h3>
-                        {video.videoType && (
-                            <span className={`text-xs font-bold rounded px-2 py-0.5 ${getTypeBadgeStyle(video.videoType)}`}>
-                                {video.videoType.toUpperCase()}
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+            <motion.Link
+                key={video.id}
+                to={video?.url}
+                onClick={e => video.status !== 'uploaded' && e.preventDefault()}
+                whileHover={{ scale: 1.01 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className={`flex items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow hover:shadow-xl text-white cursor-auto ${forUse == 0 && 'p-3'}`}
+            >
+
+                {/* Left Section */}
+                <div className="flex items-start gap-x-4 flex-1">
+                    <div className="relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md group">
+                        <motion.img
+                            src={
+                                video.thumbnail
+                                    ? video.status !== 'uploaded'
+                                        ? `http://localhost:3000/api/get/stream/file?type=image&id=${video.thumbnail}`
+                                        : video.thumbnail
+                                    : nonThumbnail
+                            }
+                            alt={video.title}
+                            className="h-full w-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {video.duration && (
+                            <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
+                                {convertTime(video.duration)}
                             </span>
                         )}
                     </div>
 
-                    {/* Channel Avatar & Handle */}
-                    {
-                        (forUse == 0 && userType == 'editor') &&
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            {userType === "editor" && video.channel && (
-                                <div className="flex items-center gap-x-2 text-sm">
-                                    <img
-                                        src={video.channel.avatar || "/placeholder.svg"}
-                                        alt={video.channel.handle}
-                                        className="w-5 h-5 rounded-full"
-                                    />
-                                    <span>{video.channel.handle}</span>
-                                </div>
+                    {/* Video info */}
+                    <div className="flex flex-col justify-between flex-1 gap-y-1">
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-base font-semibold line-clamp-2">{video.title}</h3>
+                            {video.videoType && (
+                                <span className={`text-xs font-bold rounded px-2 py-0.5 ${getTypeBadgeStyle(video.videoType)}`}>
+                                    {video.videoType.toUpperCase()}
+                                </span>
                             )}
                         </div>
-                    }
 
-                    {/* Views + Published date */}
-                    {
-                        video.status == 'uploaded' ?
+                        {(forUse === 0 && userType === 'editor') && (
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                <img
+                                    src={video.channel?.avatar || "/placeholder.svg"}
+                                    alt={video.channel?.handle}
+                                    className="w-5 h-5 rounded-full"
+                                />
+                                <span>{video.channel?.handle}</span>
+                            </div>
+                        )}
+
+                        {video.status === 'uploaded' ? (
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                     <Eye className="h-3.5 w-3.5" />
@@ -161,52 +164,62 @@ const VideoCard = ({ video, userType, forUse, channel }) => {
                                     <span>{convertPublishTime(video.publishedAt)}</span>
                                 </div>
                             </div>
-                            :
-                            video.uploadAt &&
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Clock className="h-3.5 w-3.5" />
-                                <span>Scheduled to upload on {convertDate(video.uploadAt)}</span>
-                            </div>
-                    }
+                        ) : (
+                            video.uploadAt && (
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span>Scheduled to upload on {convertDate(video.uploadAt)}</span>
+                                </div>
+                            )
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            {/* Right Status Badge */}
-            <div className='flex gap-x-4'>
-                <span
-                    className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
-                >
-                    {/* Editor name */}
-                    <p className="font-bold text-md">@{video.editor}</p>
-                </span>
-                <span
-                    className={`text-xs rounded-md px-3 py-2 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
-                >
-                    <Clock className="w-4 h-4" />
-                    <p className="font-bold text-md">{getStatusLabel(video.status)}</p>
-                </span>
-                {
-                    (userType == 'youtuber' && video.status == 'reviewPending')
-                    &&
-                    <Button
-                        onClick={_ => AsyncFetcher({
-                            url: '/service/review-video-link',
-                            methodType: 'POST',
-                            bodyData: {
-                                channelName: channel.name,
-                                channelAvatar: channel.avatar,
-                                channelUserHandle: channel.userHandle,
-                                videoId: video.id,
-                                videoTitle: video.title
-                            },
-                            cb: ({ data }) => navigate(data.link)
-                        })}
-                        className='bg-white text-black hover:bg-white/80 hover:text-black hover:cursor-pointer'
-                    >Review</Button>
-                }
-            </div>
-        </Link >
-    )
+                {/* Right Badge + Button */}
+                <div className='flex gap-x-4 items-center'>
+                    <span
+                        className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
+                    >
+                        <p className="font-bold text-md">@{video.editor}</p>
+                    </span>
+                    <span
+                        className={`text-xs rounded-md px-3 py-2 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
+                    >
+                        <Clock className="w-4 h-4" />
+                        <p className="font-bold text-md">{getStatusLabel(video.status)}</p>
+                    </span>
+
+                    {userType === 'youtuber' && video.status === 'reviewPending' && (
+                        <motion.div
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 250 }}
+                        >
+                            <Button
+                                onClick={() =>
+                                    AsyncFetcher({
+                                        url: '/service/review-video-link',
+                                        methodType: 'POST',
+                                        bodyData: {
+                                            channelName: channel.name,
+                                            channelAvatar: channel.avatar,
+                                            channelUserHandle: channel.userHandle,
+                                            videoId: video.id,
+                                            videoTitle: video.title
+                                        },
+                                        cb: ({ data }) => window.open(data.link, '_blank')
+                                    })
+                                }
+                                className="bg-white text-black hover:bg-white/80 hover:text-black hover:cursor-pointer shadow-sm"
+                            >
+                                Review
+                            </Button>
+                        </motion.div>
+                    )}
+                </div>
+            </motion.Link >
+        </motion.div >
+    );
 }
 
-export default VideoCard
+export default VideoCard;

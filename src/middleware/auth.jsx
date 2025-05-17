@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom';
-import { useAccessToken } from '../context/acsTkn'
+import { useUser } from '../context/user'
 
 export const AuthMiddleWare = ({ children }) => {
+    const [user] = useUser();
     return children
-    // const [accessToken] = useAccessToken();
-    // return accessToken ? children : <Navigate to='/login' />
+    // return user.id ? children : <Navigate to='/login' />
 }

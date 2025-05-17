@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { App, Dashboard, Info, JoinWS, Layout, Login, Review, Upload, ReviewLink } from '../src/pages'
+import { App, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ContextProvider from './context/Context'
 import { Toaster } from "sonner"
@@ -36,11 +36,6 @@ createRoot(document.getElementById('root')).render(
           <Route path='dashboard' element={
             <AuthMiddleWare>
               <Dashboard />
-            </AuthMiddleWare>
-          } />
-          <Route path='review' element={
-            <AuthMiddleWare>
-              <Review />
             </AuthMiddleWare>
           } />
           <Route path='review/:link' element={

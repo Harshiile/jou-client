@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Review = () => {
+const Workspaces = () => {
     return (
         <div>
-            sssssss
+
         </div>
     )
 }
 
-export default Review
+export default Workspaces
