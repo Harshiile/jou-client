@@ -100,8 +100,9 @@ const VideoCard = ({ video, userType, forUse, channel }) => {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
+            className='my-4'
         >
-            <motion.Link
+            <Link
                 key={video.id}
                 to={video?.url}
                 onClick={e => video.status !== 'uploaded' && e.preventDefault()}
@@ -217,7 +218,7 @@ const VideoCard = ({ video, userType, forUse, channel }) => {
                         </motion.div>
                     )}
                 </div>
-            </motion.Link >
+            </Link >
         </motion.div >
     );
 }

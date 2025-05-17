@@ -21,35 +21,33 @@ const Calender = ({ videos }) => {
 
     const generateCalendar = () => {
         const days = [];
-        let day = startDate;
+        let day = startOfMonth(currentMonth);
+        const lastDay = endOfMonth(currentMonth);
 
-        while (day <= endDate) {
-            console.log(day);
+        while (day <= lastDay) {
+            const dateStr = day.toDateString();
+            const video = videoUploadMap.get(dateStr);
 
-            for (let i = 0; i < 7; i++) {
-                const thisDay = addDays(day, i);
-                const dateStr = thisDay.toDateString();
+            days.push(
+                <Cell
+                    key={day}
+                    day={day}
+                    video={video}
+                    isCurrentMonth={true}
+                    isToday={isSameDay(day, new Date())}
+                    setHoveredVideo={setHoveredVideo}
+                />
+            );
 
-                const video = videoUploadMap.get(dateStr);
-                days.push(
-                    <Cell
-                        key={thisDay}
-                        day={thisDay}
-                        video={video}
-                        isCurrentMonth={isSameMonth(thisDay, currentMonth)}
-                        isToday={isSameDay(thisDay, new Date())}
-                        setHoveredVideo={setHoveredVideo}
-                    />
-                );
-            }
-            day = addDays(day, 7);
+            day = addDays(day, 1);
         }
 
-        return <div className="grid grid-cols-7 gap-2">{days}</div>;
+        return <div className="grid grid-cols-13 gap-y-3">{days}</div>;
     };
 
+
     return (
-        <div className="w-full h-full mt-10">
+        <div className="w-full h-full">
             <div className="flex justify-center items-center mb-4 gap-x-4">
                 <ArrowLeftCircleIcon onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} />
                 <h2 className="text-xl font-bold">{format(currentMonth, 'MMMM yyyy')}</h2>

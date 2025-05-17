@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { Clock } from 'lucide-react';
-import { getTypeBadgeStyle } from '../../VideoCard';
+import { getTypeBadgeStyle } from '../VideoCard';
 
 const VideoInfoSlider = ({ video }) => {
     return (
