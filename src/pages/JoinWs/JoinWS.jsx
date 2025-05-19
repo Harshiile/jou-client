@@ -14,7 +14,7 @@ const JoinWS = () => {
     const navigate = useNavigate()
     useEffect(() => {
         AsyncFetcher({
-            url: `/get/ws-metadata/${searchParams.linkParams}`,
+            url: `/get/workspace/metadata/${searchParams.linkParams}`,
             cb: ({ data }) => setWorkspace(data.channelMetaData)
         })
     }, [])
@@ -40,7 +40,7 @@ const JoinWS = () => {
 
     const handleJoin = () => {
         AsyncFetcher({
-            url: `/service/join/workspace/${searchParams.linkParams}`,
+            url: `/workspace/join/initial/${searchParams.linkParams}`,
             cb: ({ message }) => {
                 toast.success(message);
                 navigate('/dashboard')
@@ -194,7 +194,7 @@ const JoinWS = () => {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                     >
-                                        {workspace.tags.length}
+                                        {workspace.tags?.length}
                                     </motion.p>
                                     <p className="text-dull text-sm">Tags</p>
                                 </motion.div>
@@ -205,7 +205,7 @@ const JoinWS = () => {
                                 className="flex flex-wrap justify-center gap-2 mb-8"
                             >
                                 <AnimatePresence>
-                                    {workspace.tags.map((tag, index) => (
+                                    {workspace.tags?.map((tag, index) => (
                                         <motion.span
                                             key={tag}
                                             initial={{ opacity: 0, scale: 0.8 }}

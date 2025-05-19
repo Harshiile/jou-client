@@ -25,9 +25,12 @@ const Dashboard = () => {
     const [hoveredWorkspace, setHoveredWorkspace] = useState(null);
 
     useEffect(() => {
+        console.log(user.id);
+        console.log(workSpaces);
+
         if (user.id && !workSpaces) {
             AsyncFetcher({
-                url: `/get/workspaces?userId=${user.id}&role=${user.userType}`,
+                url: '/get/user/workspaces',
                 cb: ({ data }) => {
                     setWorkSpaces(data.workspaces);
                 },
@@ -39,7 +42,7 @@ const Dashboard = () => {
 
     const fetchVideos = (wsId) => {
         AsyncFetcher({
-            url: `/get/videos?workspace=${wsId}`,
+            url: `/get/user/workspace/videos?workspace=${wsId}`,
             cb: ({ data }) => {
                 setVideos(data.metadata);
                 setFilterVideos(data.metadata);
@@ -74,7 +77,7 @@ const Dashboard = () => {
                     <motion.button
                         className="absolute top-2 right-2 bg-white text-primary p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Add New WorkSpace"
-                        whileHover={{ scale: 1.1 }}
+                        whilegover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         <Plus size={16} />
@@ -82,12 +85,18 @@ const Dashboard = () => {
                     <p className="text-lg font-semibold mb-3">Workspaces</p>
 
                     <div className="relative flex flex-wrap items-center gap-4">
-                        {workspaces.map((ws, idx) => (
+                        {workSpaces?.map((ws, idx) => (
                             <motion.div
                                 key={idx}
-                                whileHover={{ scale: 1.05 }}
+                                whilehover={{ scale: 1.05 }}
                                 transition={{ type: 'spring', stiffness: 180 }}
                                 className="relative w-24 h-24 rounded-full border-4 border-secondary overflow-hidden cursor-pointer"
+                                onClick={() => {
+                                    console.log(ws);
+
+                                    setIsDrawerOpen(!isDrawerOpen);
+                                    setChannel(ws);
+                                }}
                                 onMouseEnter={() => setHoveredWorkspace(ws)}
                                 onMouseLeave={() => setHoveredWorkspace(null)}
                             >

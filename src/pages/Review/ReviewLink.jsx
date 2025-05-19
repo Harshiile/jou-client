@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import { useState } from 'react'
 import { Eye, ThumbsUp, Clock, MessageCircle, Calendar, AlertTriangle, ThumbsDown } from 'lucide-react'
 import { motion } from 'framer-motion'
-// import videoPublic from '/video.mp4'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 import { Button } from '../../components/ui/button'
 import { useUser } from '../../context/user'
@@ -12,6 +11,8 @@ import { AsyncFetcher } from '../../lib/Fetcher'
 import { useParams } from 'react-router-dom'
 import FullLoader from '../../components/fullLoader'
 import PastLink from './PastLink'
+import { format } from "date-fns"
+import { toast } from 'sonner'
 
 const ReviewLink = () => {
     const [user] = useUser()
@@ -20,6 +21,7 @@ const ReviewLink = () => {
     const [isVideoHovered, setIsVideoHovered] = useState(false);
     const [confirmApprove, setConfirmApprove] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState(false);
+    const [open, setOpen] = useState(false)
     const [dialogData, setDialogData] = useState({
         title: null,
         desc: null,
@@ -27,38 +29,39 @@ const ReviewLink = () => {
     })
     const [confirmReject, setConfirmReject] = useState(false);
     const [isLoading, setisLoading] = useState(true)
-    const [videoDetails, setVideoDetails] = useState(null)
+    const [video, setVideo] = useState(null)
 
 
     useEffect(() => {
         const { link } = searchParams
         if (link) {
             AsyncFetcher({
-                url: `/get/video-metadata/${link}`,
+                url: `/get/video/metadata/${link}`,
                 cb: ({ data }) => {
+                    console.log(data);
                     if (data.error) setIsVideoProcessDone(true)
-                    else setVideoDetails(data?.videoDetails)
+                    else setVideo(data?.videoDetails)
                 }
             })
         }
     }, [])
 
 
-    const handleApprove = () => {
-        if (!confirmApprove) {
-            setConfirmApprove(true);
-            return;
-        }
-        // onApprove(video.id);
+    const handleApprove = (isApprove) => {
+        setConfirmDialog(false)
+        AsyncFetcher({
+            url: '/youtube/video/approval',
+            methodType: 'POST',
+            bodyData: {
+                isApprove,
+                schedule: video.willUploadAt,
+                fileId: video.fileId
+            },
+            cb: ({ data, message }) => toast.success(message)
+        })
+        return;
     };
 
-    const handleReject = () => {
-        if (!confirmReject) {
-            setConfirmReject(true);
-            return;
-        }
-        // onReject(video.id);
-    };
     return (
         <>
             {
@@ -66,7 +69,7 @@ const ReviewLink = () => {
                     <PastLink />
                     :
                     <>
-                        {!videoDetails ?
+                        {!video ?
                             <FullLoader />
                             :
                             <motion.div
@@ -85,8 +88,8 @@ const ReviewLink = () => {
                                                 {/* Channel Avatar */}
                                                 <div className='h-10 w-10 flex-shrink-0'>
                                                     <img
-                                                        src={videoDetails?.channelAvatar}
-                                                        alt={videoDetails?.channelName}
+                                                        src={video?.channelAvatar}
+                                                        alt={video?.channelName}
                                                         className='w-full h-full rounded-full object-cover border border-secondary'
                                                     />
                                                 </div>
@@ -94,12 +97,12 @@ const ReviewLink = () => {
                                                 {/* Channel Info */}
                                                 <div className='flex-1 flex flex-col justify-center'>
                                                     <div className='flex items-center space-x-1'>
-                                                        <span className='font-bold text-gray-100'>{videoDetails?.channelName}</span>
+                                                        <span className='font-bold text-gray-100'>{video?.channelName}</span>
                                                         <span className='text-gray-400 text-sm'>
-                                                            {videoDetails?.channelUserHandle}
+                                                            {video?.channelUserHandle}
                                                         </span>
                                                     </div>
-                                                    <div className='text-gray-400 text-xs line-clamp-1'>{videoDetails?.videoTitle}</div>
+                                                    <div className='text-gray-400 text-xs line-clamp-1'>{video?.title}</div>
                                                 </div>
 
                                                 {/* Review Status */}
@@ -121,10 +124,15 @@ const ReviewLink = () => {
                                                     controlsList='nodownload'
                                                     disablePictureInPicture
                                                     className='w-full h-full object-cover'
-                                                    onLoadedData={_ => setisLoading(false)}
+                                                    onLoadedData={_ => {
+                                                        console.log(_);
+
+                                                        setisLoading(false)
+                                                    }
+                                                    }
                                                 >
                                                     <source
-                                                        src={`http://localhost:3000/api/get/stream/file?type=video&id=${videoDetails?.fileId}`}
+                                                        src={`http://localhost:3000/get/file-stream?type=video&id=${video?.fileId}`}
                                                         type='video/mp4'
                                                     />
                                                 </video>
@@ -139,7 +147,7 @@ const ReviewLink = () => {
                                                         // backgroundColor: 'rgba(255, 255, 255, 0.15)',  // light translucent white
                                                     }}
                                                 >
-                                                    {videoDetails?.videoTitle}
+                                                    {video?.title}
                                                 </motion.div>
 
                                             </div>
@@ -157,24 +165,18 @@ const ReviewLink = () => {
                                 bg-red-900 text-white 
                                 hover:bg-red-600  hover:text-gray-200 hover:font-bold`}
                                                     >
-                                                        {confirmReject ? (
-                                                            <>
-                                                                <AlertTriangle size={18} className="text-red-400" />
-                                                                <span>Confirm Rejection</span>
-                                                            </>
-                                                        ) : (
-                                                            <div className='flex items-center gap-x-2' onClick={() => {
-                                                                setDialogData({
-                                                                    title: 'Video Rejection',
-                                                                    desc: 'Are you sure to reject this video?',
-                                                                    cta: 'Reject'
-                                                                })
-                                                                setConfirmDialog(true)
-                                                            }}>
-                                                                <ThumbsDown size={18} />
-                                                                <span>Reject</span>
-                                                            </div>
-                                                        )}
+
+                                                        <div className='flex items-center gap-x-2' onClick={() => {
+                                                            setDialogData({
+                                                                title: 'Video Rejection',
+                                                                desc: 'Are you sure to reject this video?',
+                                                                cta: 'Reject'
+                                                            })
+                                                            setConfirmDialog(true)
+                                                        }}>
+                                                            <ThumbsDown size={18} />
+                                                            <span>Reject</span>
+                                                        </div>
                                                     </button>
 
                                                     <button
@@ -183,24 +185,17 @@ const ReviewLink = () => {
                             bg-white/90 text-black   animate-pulse'
                                  hover:bg-white hover:font-bold`}
                                                     >
-                                                        {confirmApprove ? (
-                                                            <>
-                                                                <AlertTriangle size={18} className="text-green-400" />
-                                                                <span>Confirm Approval</span>
-                                                            </>
-                                                        ) : (
-                                                            <div className='flex items-center gap-x-2' onClick={() => {
-                                                                setDialogData({
-                                                                    title: 'Video Upload Approval',
-                                                                    desc: 'Once Approves, then no getting back',
-                                                                    cta: 'Approve'
-                                                                })
-                                                                setConfirmDialog(true)
-                                                            }}>
-                                                                <ThumbsUp size={18} />
-                                                                <span>Approve</span>
-                                                            </div>
-                                                        )}
+                                                        <div className='flex items-center gap-x-2' onClick={() => {
+                                                            setDialogData({
+                                                                title: 'Video Upload Approval',
+                                                                desc: 'Once Approves, then no getting back',
+                                                                cta: 'Approve'
+                                                            })
+                                                            setConfirmDialog(true)
+                                                        }}>
+                                                            <ThumbsUp size={18} />
+                                                            <span>Approve</span>
+                                                        </div>
                                                     </button>
                                                 </div>
                                             </div>
@@ -217,7 +212,10 @@ const ReviewLink = () => {
                                                         <Button variant="outline" onClick={() => setConfirmDialog(false)} className='text-black'>
                                                             Cancel
                                                         </Button>
-                                                        <Button className={dialogData.cta == 'Approve' ? "bg-green-400 text-black" : "bg-red-500"}>
+                                                        <Button
+                                                            className={dialogData.cta == 'Approve' ? "bg-green-400 text-black" : "bg-red-500"}
+                                                            onClick={() => handleApprove(dialogData.cta == 'Approve' ? true : false)}
+                                                        >
                                                             {dialogData.cta}
                                                         </Button>
                                                     </DialogFooter>

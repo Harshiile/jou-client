@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { App, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink } from '../src/pages'
+import { App, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink, Authorize } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ContextProvider from './context/Context'
 import { Toaster } from "sonner"
@@ -18,6 +18,7 @@ createRoot(document.getElementById('root')).render(
           </AuthMiddleWare>}
         />
         <Route path='/login' element={<Login />} />
+        <Route path='/authorize-editor/:link' element={<Authorize />} />
         <Route path='/join/workspace/:linkParams' element={
           <AuthMiddleWare>
             <JoinWS />

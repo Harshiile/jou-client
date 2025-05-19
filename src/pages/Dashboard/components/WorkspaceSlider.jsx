@@ -23,7 +23,7 @@ const WorkspaceSlider = ({ workspace }) => {
                 {/* Metadata */}
                 <div className="flex flex-col gap-y-1">
                     <h4 className="font-bold text-xl">{workspace.name}</h4>
-                    <p className="text-sm text-dull line-clamp-2">{workspace.description}</p>
+                    <p className="text-sm text-dull line-clamp-2">{workspace.desc}</p>
 
                     {/* Handle & Total Videos */}
                     <div className="mt-2 text-sm space-y-1">
@@ -37,7 +37,7 @@ const WorkspaceSlider = ({ workspace }) => {
                         </div>
                         <div className="flex items-center gap-2">
                             <CalendarDays className="w-4 h-4" />
-                            <span>Created on: {format(new Date(workspace.createdAt), 'do MMM yyyy')}</span>
+                            {/* <span>Created on: {format(new Date(workspace.createdAt), 'do MMM yyyy')}</span> */}
                         </div>
                     </div>
                 </div>

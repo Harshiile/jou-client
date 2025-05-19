@@ -6,6 +6,7 @@ import Upload from "./Upload/Upload"
 import JoinWS from './JoinWs/JoinWS'
 import Info from './Info/Info'
 import ReviewLink from './Review/ReviewLink'
+import Authorize from './Authorize/Authorize'
 
 export {
     App,
@@ -15,5 +16,6 @@ export {
     Layout,
     Info,
     JoinWS,
-    ReviewLink
+    ReviewLink,
+    Authorize
 }

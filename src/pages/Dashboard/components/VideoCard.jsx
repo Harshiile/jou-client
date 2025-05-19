@@ -106,7 +106,7 @@ const VideoCard = ({ video, userType, forUse, channel }) => {
                 key={video.id}
                 to={video?.url}
                 onClick={e => video.status !== 'uploaded' && e.preventDefault()}
-                whileHover={{ scale: 1.01 }}
+                whilehover={{ scale: 1.01 }}
                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
                 className={`flex items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow hover:shadow-xl text-white cursor-auto ${forUse == 0 && 'p-3'}`}
             >
@@ -192,7 +192,7 @@ const VideoCard = ({ video, userType, forUse, channel }) => {
 
                     {userType === 'youtuber' && video.status === 'reviewPending' && (
                         <motion.div
-                            whileHover={{ scale: 1.03 }}
+                            whilehover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ type: "spring", stiffness: 250 }}
                         >

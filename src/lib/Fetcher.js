@@ -13,7 +13,7 @@ export const AsyncFetcher = async ({ url, cb, methodType = 'GET', bodyData }) =>
             }
             : { credentials: 'include' };
 
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api${url}`, fetchOptions);
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}${url}`, fetchOptions);
 
         if (res.status === 999) {
             // Token expired — Renew the token

@@ -95,7 +95,7 @@ const Upload = () => {
         e.preventDefault();
         if (!title) return toast.error("Title is required");
         if (!videoType) return toast.error("Type of Video is required");
-        if (!isMadeForKids) return toast.error("Audience Type is required");
+        if (isMadeForKids == null) return toast.error("Audience Type is required");
         if (thumbnailFile && thumbnailFile.size >= 2097152) return toast.error("Thumbnail size must be under 2 MB");
         if (!file) return toast.error("Please select a video first");
 
@@ -113,7 +113,7 @@ const Upload = () => {
 
         setIsUploading(true);
         if (socket.id) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}/api/drive/upload`, {
+            fetch(`${import.meta.env.VITE_BACKEND_URL}/drive/upload`, {
                 method: 'POST',
                 body: formData,
                 credentials: "include",
@@ -230,7 +230,7 @@ const Upload = () => {
                                                     value='false'
                                                     id='notMadeForKids'
                                                     className='data-[state=checked]:bg-white transition'
-                                                    onClick={() => setIsMadeForKids(null)}
+                                                    onClick={() => setIsMadeForKids(false)}
                                                 />
                                                 <Label htmlFor='notMadeForKids' className='select-none'>No, Not Made For Kids</Label>
                                             </div>
@@ -309,14 +309,14 @@ const Upload = () => {
                                             </AnimatePresence>
                                         </div>
                                     )}
-                                    <motion.input
+                                    {/* <motion.input
                                         type="submit"
                                         value="Upload"
                                         className="w-full bg-white text-black px-4 py-3 rounded-md mt-6 mb-8 font-semibold cursor-pointer hover:bg-gray-200 transition"
                                         whileTap={{ scale: 0.97 }}
-                                    />
-                                </motion.div>
+                                    /> */}
 
+                                </motion.div>
                                 <UploaderDrawer
                                     isUploading={isUploading}
                                     setIsUploading={setIsUploading}

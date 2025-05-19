@@ -29,6 +29,7 @@ import VideoCard, { convertViews } from './VideoCard';
 import { useEffect, useState } from 'react';
 import { AsyncFetcher } from '../../../lib/Fetcher';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideos, channel }) => {
     const [videos, setVideos] = useVideos();
@@ -94,13 +95,16 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                         </div>
                                     </div>
                                     {user.userType === 'youtuber' && (
-                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                        <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                             <Button
                                                 className="bg-white text-black font-bold"
                                                 onClick={() =>
                                                     AsyncFetcher({
-                                                        url: `/service/generate-link?ws=${channel.id}`,
-                                                        cb: ({ data }) => console.log(data?.link)
+                                                        url: `/generate-link/workspace/join?ws=${channel.id}`,
+                                                        cb: ({ data }) => {
+                                                            navigator.clipboard.writeText(data?.link);
+                                                            toast.success('Link Copied')
+                                                        }
                                                     })
                                                 }
                                             >
@@ -116,7 +120,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                     <h3 className="text-lg font-semibold">Channel Videos</h3>
                                     <div className="flex items-center gap-x-4">
                                         {user.userType === 'editor' && (
-                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                 <Link to="/upload">
                                                     <Button className="bg-white text-black font-bold">New Upload</Button>
                                                 </Link>
@@ -126,14 +130,14 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                         {/* FILTER */}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger>
-                                                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                                                <motion.div whilehover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                                                     <Button className="bg-white text-black font-bold rounded-xl">Filter</Button>
                                                 </motion.div>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="text-[#e3e3e3] border-secondary shadow-lg translate-y-3 bg-primary flex flex-col gap-y-4 p-6 rounded-lg">
                                                 <DropdownMenuGroup className="flex gap-x-3 justify-center">
                                                     {['time', 'views'].map((param) => (
-                                                        <motion.div key={param} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <motion.div key={param} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => toggleParams(param)}
                                                                 className={`border border-secondary ${filterParams[param] ? 'bg-green-400 text-black font-bold' : ''}`}
@@ -146,7 +150,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
 
                                                 <DropdownMenuGroup className="flex gap-x-3 justify-center">
                                                     {['public', 'private', 'unlisted'].map((type) => (
-                                                        <motion.div key={type} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <motion.div key={type} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => setVideoType(type)}
                                                                 className={`border border-secondary ${filterParams.videoType === type ? 'bg-green-400 text-black font-bold' : ''}`}
@@ -159,7 +163,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
 
                                                 <DropdownMenuGroup className="flex gap-x-3 justify-center">
                                                     {['reviewPending', 'uploadPending', 'uploaded'].map((status) => (
-                                                        <motion.div key={status} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <motion.div key={status} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => setVideoStatus(status)}
                                                                 className={`border border-secondary ${filterParams.status === status ? 'bg-green-400 text-black font-bold' : ''}`}
