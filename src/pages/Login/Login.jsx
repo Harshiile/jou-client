@@ -5,6 +5,7 @@ import { Label } from '../../components/ui/label';
 import { toast } from "sonner";
 import logo from '/logo.png';
 
+
 import {
     Select,
     SelectContent,
@@ -148,7 +149,7 @@ const Login = () => {
                                 cb: ({ message, data }) => {
                                     setUser(data.userData);
                                     toast.success(message);
-                                    navigate('/upload');
+                                    navigate('/dashboard');
                                 },
                             });
                         }}

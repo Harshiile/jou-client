@@ -40,7 +40,7 @@ function App() {
   return (
     <>
       <button onClick={() => AsyncFetcher({
-        url: '/youtube/get/oauth-url',
+        url: '/youtube/connecter-link',
         cb: (res) => {
           window.location.href = res.data.url
         }

@@ -31,8 +31,7 @@ import { AsyncFetcher } from '../../../lib/Fetcher';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideos, channel }) => {
-    const [videos, setVideos] = useVideos();
+export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFilterVideos, channel }) => {
     const [user] = useUser();
     const [filterParams, setFilterParams] = useState({
         views: false,
@@ -41,10 +40,6 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
         status: null
     });
     const [isAscending, setIsAscending] = useState(true);
-
-    useEffect(() => {
-        setFilterVideos(videos);
-    }, []);
 
     const toggleParams = (param) => {
         setFilterParams(prev => ({
@@ -66,6 +61,10 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
             status: status === prev.status ? null : status
         }));
     };
+
+    const searchOnChange = e => {
+        setFilterVideos(videos?.filter(v => v.title.startsWith(e.target.value)))
+    }
 
     if (!channel) return null;
 
@@ -97,7 +96,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                     {user.userType === 'youtuber' && (
                                         <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                             <Button
-                                                className="bg-white text-black font-bold"
+                                                className="bg-white text-black font-bold hover:bg-white hover:text-black"
                                                 onClick={() =>
                                                     AsyncFetcher({
                                                         url: `/generate-link/workspace/join?ws=${channel.id}`,
@@ -131,7 +130,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                         <DropdownMenu>
                                             <DropdownMenuTrigger>
                                                 <motion.div whilehover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                                    <Button className="bg-white text-black font-bold rounded-xl">Filter</Button>
+                                                    <Button className="bg-white text-black font-bold rounded-md hover:bg-white hover:text-black">Filter</Button>
                                                 </motion.div>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="text-[#e3e3e3] border-secondary shadow-lg translate-y-3 bg-primary flex flex-col gap-y-4 p-6 rounded-lg">
@@ -176,10 +175,15 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                             </DropdownMenuContent>
                                         </DropdownMenu>
 
-                                        <Input placeholder="Search" className="font-bold" />
+                                        <Input
+                                            placeholder="Search"
+                                            className="font-bold w-[25vw]"
+                                            onChange={searchOnChange}
+
+                                        />
                                         <ArrowUpDown
                                             onClick={() => setIsAscending(prev => !prev)}
-                                            className={`w-8 h-8 cursor-pointer transition-all ${isAscending && 'bg-white text-black rounded px-2'}`}
+                                            className={`w-12 h-8 cursor-pointer transition-all ${isAscending && 'bg-white text-black rounded'} p-1`}
                                         />
                                     </div>
                                 </div>
@@ -189,7 +193,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                     {filterVideos != null ? (
                                         filterVideos.length > 0 ? (
                                             <AnimatePresence>
-                                                {/* {filterVideos.map((video) => (
+                                                {filterVideos.map(video => (
                                                     <motion.div
                                                         key={video.id}
                                                         initial={{ opacity: 0, y: 10 }}
@@ -200,7 +204,7 @@ export const ChannelDrawer = ({ open, onOpenChange, filterVideos, setFilterVideo
                                                         <VideoCard video={video} userType={user.userType} channel={channel} forUse={1} />
                                                         <Separator className="bg-secondary" />
                                                     </motion.div>
-                                                ))} */}
+                                                ))}
                                             </AnimatePresence>
                                         ) : (
                                             <p>Workspace does not contain any videos</p>

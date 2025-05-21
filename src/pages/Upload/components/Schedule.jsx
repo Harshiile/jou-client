@@ -17,7 +17,7 @@ const fadeInUp = {
     exit: { opacity: 0, y: 15, scale: 0.98, transition: { duration: 0.25, ease: "easeIn" } },
 };
 
-export function Schedule({ date, setDate }) {
+export function Schedule({ date, setDate, className }) {
     const [isOpen, setIsOpen] = useState(false);
     const hours = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -48,7 +48,8 @@ export function Schedule({ date, setDate }) {
                     variant="outline"
                     className={cn(
                         "w-full justify-start text-left font-normal bg-primary border border-secondary hover:bg-primary hover:text-white transition",
-                        !date && "text-muted-foreground"
+                        !date && "text-muted-foreground",
+                        className
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />

@@ -55,7 +55,8 @@ const ReviewLink = () => {
             bodyData: {
                 isApprove,
                 schedule: video.willUploadAt,
-                fileId: video.fileId
+                fileId: video.fileId,
+                workspaceId: video.workspaceId
             },
             cb: ({ data, message }) => toast.success(message)
         })

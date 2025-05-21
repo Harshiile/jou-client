@@ -74,18 +74,6 @@ const Layout = () => {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </Link>
-                  {
-                    user.userType == 'youtuber' &&
-                    <Link to='/review'>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton isActive={currentPath.pathname == '/review'}>
-                          <Star className="h-4 w-4" />
-                          <span>Review</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </Link>
-                  }
-
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -131,7 +119,7 @@ const Layout = () => {
                     className='flex gap-x-2 items-center'
                   >
                     <span className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer">H</span>
-                    <span className='text-md font-semibold hover:cursor-pointer'>{user.name}</span>
+                    <span className='text-md font-semibold hover:cursor-pointer'>{user.name?.length > 16 ? `${user.name?.slice(0, 12)}...` : user.name}</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -140,69 +128,9 @@ const Layout = () => {
         </Sidebar>
       </SidebarProvider>
 
-      {/* Right - Upper*/}
-      {/* <div className='w-[90vw] h-[7vh] flex items-center justify-end fixed top-0 left-[10vw] border-b border-secondary bg-primary text-white'>
-        <div className='flex items-center gap-x-6 pr-10'>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Bell className='w-6 h-6 cursor-pointer text-white transition' />
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent className="w-80 h-100 bg-primary text-[#e3e3e3] border-secondary shadow-lg -translate-x-30 scroll-auto">
-                    <DropdownMenuLabel className="text-lg font-semibold text-white">Notifications</DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-secondary" />
-
-                    <DropdownMenuGroup>
-                      {notifications.map((notif, index) => (
-                        <div key={notif.id} className="px-2 py-2">
-                          <p className="text-sm font-medium text-white">{notif.type}</p>
-                          <p className="text-sm text-[#d4d4d8]">{notif.message}</p>
-                          <p className="text-xs text-[#71717a] mt-1">{notif.date}</p>
-
-                          {index !== notifications.length - 1 && (
-                            <DropdownMenuSeparator className="bg-secondary my-2" />
-                          )}
-                        </div>
-                      ))}
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverContent className="w-56 p-0 mt-2 " align="end">
-                    <Command className='bg-primary'>
-                      <CommandGroup heading="Harsh Vora" className="px-4 py-2 text-white" />
-                      <CommandSeparator className='bg-secondary' />
-                      <CommandGroup>
-                        <CommandItem className='text-white' onSelect={() => console.log("Settings clicked")}>
-                          Settings
-                        </CommandItem>
-                        <Separator className='bg-secondary' />
-                        <CommandItem className='text-white' onSelect={() => console.log("Dashboard clicked")}>
-                          Dashboard
-                        </CommandItem>
-                        <Separator className='bg-secondary' />
-                        <CommandItem className='text-white' onSelect={() => console.log("Analysis clicked")}>
-                          Analysis
-                        </CommandItem>
-                      </CommandGroup>
-                      <CommandSeparator className='bg-secondary' />
-                      <CommandItem
-                        className="text-red-600 hover:bg-red-100"
-                        onSelect={() => setConfirmLogout(true)}
-                      >
-                        Logout
-                      </CommandItem>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div > */}
-
       {/* Logout Confirmation Dialog */}
       <Dialog open={confirmLogout} onOpenChange={setConfirmLogout}>
-        <DialogContent className='bg-primary'>
+        <DialogContent className='bg-primary border-secondary'>
           <DialogHeader>
             <DialogTitle>Confirm Logout</DialogTitle>
           </DialogHeader>

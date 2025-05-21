@@ -3,7 +3,7 @@ import './index.css'
 import { App, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink, Authorize } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ContextProvider from './context/Context'
-import { Toaster } from "sonner"
+import { Toaster } from "./components/ui/sonner"
 import { AuthMiddleWare } from './middleware/auth'
 
 
@@ -47,6 +47,6 @@ createRoot(document.getElementById('root')).render(
         </Route>
       </Routes>
     </ContextProvider>
-    <Toaster richColors position="bottom-right" />
+    <Toaster richColors />
   </BrowserRouter>
 )
