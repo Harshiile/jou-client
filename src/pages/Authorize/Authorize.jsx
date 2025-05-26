@@ -13,7 +13,7 @@ const Authorize = () => {
 
     useEffect(() => {
         AsyncFetcher({
-            url: `/workspace/join/final/${searchParams.link}`,
+            url: `/decrypt-link/${searchParams.link}`,
             cb: ({ data }) => {
                 console.log(data);
                 setData(data?.decryptedData?.data)
@@ -23,7 +23,7 @@ const Authorize = () => {
 
     const handleAuthorize = (approve) => {
         AsyncFetcher({
-            url: `/service/editor-join/workspace?id=${data.editorId}&workspaceId=${data.wsId}&approve=${approve}`,
+            url: `/workspace/join/final?id=${data.editorId}&workspaceId=${data.wsId}&approve=${approve}`,
             methodType: 'POST',
             body: { workspaceId: data.wsId },
             cb: ({ message }) => {
@@ -113,13 +113,35 @@ const Authorize = () => {
                         className="border-t border-gray-700/30 my-6 pt-6"
                     >
                         <h2 className="text-xl font-semibold text-dull mb-3">Authorize Editor</h2>
-                        <p className="text-dull mb-2">{data.editorName}</p>
-                        <p className="text-dull text-sm mb-6">{data.editorMail}</p>
+                        <div>
+                            <span>{data.editorName} - </span>
+                            <span className='text-blue-500'>{data.editorMail}</span>
+                        </div>
+                        <span> has requested permission to join your workspace <strong>{data.wsName}</strong></span>
+                    </motion.div>
+
+
+                    <motion.div
+                        variants={itemVariants}
+                        className="text-dull text-sm mb-6 leading-relaxed bg-white/5 p-4 rounded-lg border border-white/10"
+                    >
+                        <p className="mb-2">
+                            Once you <strong>authorize</strong> <span className="text-white">{data.editorName}</span>, they will be granted access to your workspace
+                        </p>
+                        <p className="mb-2">
+                            Editors can <strong>upload & schedule videos</strong> directly to your YouTube channel
+                        </p>
+                        <p className="mb-2">
+                            You’ll receive notifications when a video is ready, and you can <strong>review & approve it</strong> before it goes live
+                        </p>
+                        <p className="text-red-400 mt-2">
+                            If you decline this request, the editor will not be able to access your workspace
+                        </p>
                     </motion.div>
 
                     <motion.div
                         variants={itemVariants}
-                        className="flex justify-center gap-4 mt-6"
+                        className="flex justify-center gap-4 mt-4"
                     >
                         <motion.button
                             onClick={() => handleAuthorize(true)}
@@ -138,6 +160,7 @@ const Authorize = () => {
                             Decline
                         </motion.button>
                     </motion.div>
+
                 </div>
             </motion.div>
         </motion.div>

@@ -26,7 +26,7 @@ export const getTypeBadgeStyle = (type) => {
 const getStatusBadgeStyle = (status) => {
     switch (status) {
         case "uploaded":
-            return " bg-[#04210f] text-green-500"
+            return "bg-[#04210f] text-green-500"
         case "uploadPending":
             return "bg-amber-500/20 text-amber-500"
         case "reviewPending":
@@ -81,34 +81,16 @@ const convertPublishTime = (date) => {
 }
 
 const convertDate = (date) => {
-    date = new Date(date)
-    const weekday = new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        timeZone: 'UTC',
-    }).format(date);
-
-    const dayMonth = new Intl.DateTimeFormat('en-US', {
-        day: '2-digit',
-        month: 'short',
-        timeZone: 'UTC',
-    }).format(date);
-
-    const time = new Intl.DateTimeFormat('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC',
-    }).format(date);
-
-    return `${weekday}, ${dayMonth} - ${time}`;
+    date = new Date(Number(date))
+    return `${date.toDateString()} - ${date.toLocaleTimeString()}`
 }
 
-const convertTime = (duration) => {
+const convertDuration = (duration) => {
     let formattedDuration = ' ';
     const dur = Duration.fromISO(duration);
-    if (dur.hours > 0) formattedDuration += `${dur.hours.toString()}:`
-    if (dur.minutes > 0) formattedDuration += `${dur.minutes.toString()}:`
-    if (dur.seconds > 0) formattedDuration += `${dur.seconds.toString()}`
+    if (dur.hours > 0) formattedDuration += `${dur.hours < 10 ? '0' + dur.hours.toString() : dur.hours.toString()}:`
+    if (dur.minutes > 0) formattedDuration += `${dur.minutes < 10 ? '0' + dur.minutes.toString() : dur.minutes.toString()}:`
+    if (dur.seconds > 0) formattedDuration += `${dur.seconds < 10 ? '0' + dur.seconds.toString() : dur.seconds.toString()}`
     return formattedDuration
 }
 
@@ -136,7 +118,7 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                         <Button
                             className="border border-secondary bg-white text-black hover:bg-white hover:text-black px-20 font-semibold text-md"
                             onClick={_ => AsyncFetcher({
-                                url: `/video/update/schedule?id=${video.id}&schedule=${date}`,
+                                url: `/video/update/schedule?id=${video.id}&schedule=${date.getTime()}`,
                                 cb: ({ message }) => { toast.success(message); setIsDialogOpen(false) }
                             })}
                         >
@@ -178,11 +160,10 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                             />
                             {video.duration && (
                                 <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
-                                    {convertTime(video.duration)}
+                                    {convertDuration(video.duration)}
                                 </span>
                             )}
                         </div>
-
                         {/* Video info */}
                         <div className="flex flex-col justify-between flex-1 gap-y-1">
                             <div className="flex items-center gap-2">
@@ -193,18 +174,16 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                                     </span>
                                 )}
                             </div>
-
-                            {userType === 'editor' && (
+                            {(userType === 'editor' && video.status == 'uploaded') && (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <img
                                         src={video.channel?.avatar || "/placeholder.svg"}
-                                        alt={video.channel?.handle}
+                                        alt={video.channelHandle}
                                         className="w-5 h-5 rounded-full"
                                     />
-                                    <span>{video.channel?.handle}</span>
+                                    <span>{video.channelHandle}</span>
                                 </div>
                             )}
-
                             {video.status === 'uploaded' ? (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <div className="flex items-center gap-1">
@@ -215,9 +194,10 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                                         <Clock className="h-3.5 w-3.5" />
                                         <span>{convertPublishTime(video.publishedAt)}</span>
                                     </div>
+
                                 </div>
                             ) : (
-                                video.willUploadAt && (
+                                video.willUploadAt ?
                                     <div className="flex items-center gap-x-2 text-sm text-muted-foreground">
                                         <Clock className="h-3.5 w-3.5" />
                                         {
@@ -241,7 +221,9 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                                             >Change Schedule Time</button>
                                         }
                                     </div>
-                                )
+                                    :
+                                    <p className='text-sm text-muted-foreground'>Will Upload immediately after youtuber approval</p>
+
                             )}
                         </div>
                     </div>
@@ -278,7 +260,7 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                                                 id: video.id,
                                                 title: video.title,
                                                 fileId: video.fileId,
-                                                willUploadAt: video.uploadAt
+                                                willUploadAt: video.willUploadAt
                                             },
                                             cb: ({ data }) => {
                                                 window.open(data.link, '_blank')

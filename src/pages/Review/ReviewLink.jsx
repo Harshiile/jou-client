@@ -49,6 +49,7 @@ const ReviewLink = () => {
 
     const handleApprove = (isApprove) => {
         setConfirmDialog(false)
+
         AsyncFetcher({
             url: '/youtube/video/approval',
             methodType: 'POST',
@@ -60,7 +61,6 @@ const ReviewLink = () => {
             },
             cb: ({ data, message }) => toast.success(message)
         })
-        return;
     };
 
     return (

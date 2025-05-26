@@ -1,6 +1,6 @@
 import { AsyncFetcher } from "./Fetcher";
 
-export const fetchMe = (setUser, accessToken, setAccessToken) => {
+export const fetchMe = (setUser) => {
     AsyncFetcher({
         url: `/get/user/refresh`,
         cb: ({ data }) => {

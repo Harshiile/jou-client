@@ -9,11 +9,11 @@ const dotTransition = {
 
 const Loader = ({ className }) => {
     return (
-        <div className={`flex items-center justify-center gap-1 ${className} w-max`}>
+        <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${className} flex gap-x-1.5`}>
             {[0, 1, 2].map((index) => (
                 <motion.span
                     key={index}
-                    className="w-2.5 h-2.5 bg-white rounded-full"
+                    className="w-2.5 h-2.5 rounded-full bg-white"
                     animate={{
                         opacity: [0.3, 1, 0.3],
                         scale: [0.8, 1.2, 0.8],

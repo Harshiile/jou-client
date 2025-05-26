@@ -20,20 +20,18 @@ import logo from '/logo.png'
 import { useEffect } from 'react'
 import { fetchMe } from '../lib/FetchMe'
 import { useUser } from "../context/user";
-import { useAccessToken } from "../context/acsTkn";
 import { AnimatePresence, motion } from 'framer-motion'
 import { AsyncFetcher } from '../lib/Fetcher'
 
 const Layout = () => {
   const [user, setUser] = useUser()
   const navigate = useNavigate()
-  const [accessToken, setAccessToken] = useAccessToken()
   const currentPath = useLocation()
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const buttonRef = useRef()
   useEffect(() => {
-    !user.id && fetchMe(setUser, accessToken, setAccessToken)
+    !user.id && fetchMe(setUser)
   }, [])
 
 
@@ -118,7 +116,9 @@ const Layout = () => {
                     onClick={() => setOpen(!open)}
                     className='flex gap-x-2 items-center'
                   >
-                    <span className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer">H</span>
+                    <span className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer">
+                      {user.name.slice(0, 1).toUpperCase()}
+                    </span>
                     <span className='text-md font-semibold hover:cursor-pointer'>{user.name?.length > 16 ? `${user.name?.slice(0, 12)}...` : user.name}</span>
                   </div>
                 </SidebarMenuButton>

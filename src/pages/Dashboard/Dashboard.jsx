@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AsyncFetcher } from '../../lib/Fetcher';
 import { useUser } from '../../context/user';
-import { useAccessToken } from '../../context/acsTkn';
 import { useWorkSpaces } from '../../context/workspaces';
 import { useVideos } from '../../context/videos';
 import Calender from './components/Schedule/Calender';
@@ -15,11 +14,11 @@ import { Separator } from '../../components/ui/separator';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
     const [user] = useUser();
     const navigate = useNavigate()
-    const [accessToken, setAccessToken] = useAccessToken();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [videos, setVideos] = useVideos();
     const [filterVideos, setFilterVideos] = useState();
@@ -34,7 +33,7 @@ const Dashboard = () => {
             AsyncFetcher({
                 url: '/get/user/workspaces',
                 cb: ({ data }) => {
-                    setWorkSpaces(data.workspaces);
+                    setWorkSpaces(new Map(Object.entries(data.workspaces)))
                 },
             });
             AsyncFetcher({
@@ -101,20 +100,25 @@ const Dashboard = () => {
                         </motion.button>
                         <p className="text-lg font-semibold mb-3">Workspaces</p>
 
-                        <div className="relative flex flex-wrap gap-4 h-full">
+                        <div className="flex flex-wrap gap-4 h-full">
                             {
                                 !workSpaces ?
-                                    <Loader className={'mx-auto'} />
+                                    <Loader />
                                     :
-                                    workSpaces.length > 0 ?
+                                    Array.from(workSpaces).length > 0 ?
                                         (
-                                            workSpaces?.map((ws, idx) => (
-                                                <motion.div
+                                            Array.from(workSpaces)?.map((workspace, idx) => {
+                                                const ws = workspace[1]
+                                                return <motion.div
                                                     key={idx}
                                                     whilehover={{ scale: 1.05 }}
                                                     transition={{ type: 'spring', stiffness: 180 }}
-                                                    className="relative w-24 h-24 rounded-full border-4 border-secondary overflow-hidden cursor-pointer"
+                                                    className={`relative w-24 h-24 rounded-full overflow-hidden  ${ws.disconnected ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                                     onClick={() => {
+                                                        if (ws.disconnected) {
+                                                            toast.error('Workspace Is Inactive');
+                                                            return;
+                                                        }
                                                         setIsDrawerOpen(!isDrawerOpen);
                                                         setChannel(ws);
                                                         AsyncFetcher({
@@ -131,10 +135,10 @@ const Dashboard = () => {
                                                     <img
                                                         src={ws.avatar}
                                                         alt={ws.name}
-                                                        className="w-full h-full object-cover"
+                                                        className={`w-full h-full object-cover`}
                                                     />
                                                 </motion.div>
-                                            ))
+                                            })
                                         )
                                         :
                                         <motion.div
@@ -145,19 +149,6 @@ const Dashboard = () => {
                                             No Workspace
                                         </motion.div>
                             }
-
-                            <AnimatePresence>
-                                {hoveredWorkspace && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -10 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <WorkspaceSlider workspace={hoveredWorkspace} />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
                         </div>
                     </motion.div>
 
@@ -171,12 +162,13 @@ const Dashboard = () => {
                         <p className="text-lg font-semibold mb-2">Schedule</p>
                         <Calender videos={tmpVideos} />
                     </motion.div>
-                </div>
+                </div >
 
                 {/* Pending Videos */}
                 <motion.div
-                    className="w-full h-[63vh] border-2 border-secondary rounded-md p-4"
-                    initial={{ opacity: 0, y: 20 }}
+                    className="w-full h-[63vh] border-2 border-secondary rounded-md p-4 relative"
+                    initial={{ opacity: 0, y: 20 }
+                    }
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
@@ -196,12 +188,12 @@ const Dashboard = () => {
                                                 exit={{ opacity: 0, y: -10 }}
                                                 transition={{ duration: 0.3 }}
                                             >
-                                                <VideoCard
+                                                {/* <VideoCard
                                                     video={video}
                                                     userType={user.userType}
                                                     forUse={0}
                                                     channel={channel}
-                                                />
+                                                /> */}
                                                 <Separator className="bg-secondary" />
                                             </motion.div>
                                         ))
@@ -218,8 +210,10 @@ const Dashboard = () => {
 
                         </AnimatePresence>
                     </div>
-                </motion.div>
-            </motion.div>
+                </motion.div >
+            </motion.div >
+
+            {hoveredWorkspace && <WorkspaceSlider workspace={hoveredWorkspace} />}
         </>
     );
 };

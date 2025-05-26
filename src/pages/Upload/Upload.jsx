@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { socket } from '../../socket';
-import { useAccessToken } from '../../context/acsTkn';
 import { useUser } from '../../context/user';
 import FileInfo from './components/FileInfo';
 import { Schedule } from './components/Schedule';
@@ -48,13 +47,12 @@ const Upload = () => {
     const [chosenWs, setChosenWs] = useState(null);
     const [workspacesForChooseWS, setWorkspacesForChooseWS] = useState(null)
 
-    const [accessToken] = useAccessToken();
     const [user] = useUser();
 
     useEffect(() => {
         AsyncFetcher({
             url: '/get/user/workspaces',
-            cb: ({ data }) => setWorkspacesForChooseWS(data.workspaces)
+            cb: ({ data }) => setWorkspacesForChooseWS(Array.from(new Map(Object.entries(data.workspaces))))
         })
 
         socket.connect();
@@ -94,11 +92,11 @@ const Upload = () => {
         }
     };
 
-    const handleUpload = (e) => {
+    const handleUpload = async (e) => {
         e.preventDefault();
-        if (!title) return toast.error("Title is required");
+
         if (!videoType) return toast.error("Type of Video is required");
-        // if (date && date.getTime() < Date.now()) return toast.error("Uploading Time must be 1 hour ahead of current time");
+        if (date && date.getTime() < Date.now()) return toast.warning("Uploading Time must be 1 hour ahead of current time");
         if (isMadeForKids == null) return toast.error("Audience Type is required");
         if (thumbnailFile && thumbnailFile.size >= 2097152) return toast.error("Thumbnail size must be under 2 MB");
         if (!file) return toast.error("Please select a video first");
@@ -109,28 +107,46 @@ const Upload = () => {
         formData.append('duration', duration);
         formData.append('videoType', videoType);
         formData.append('isMadeForKids', isMadeForKids);
-        formData.append('willUploadAt', date);
-        formData.append('workspace', 'UCHZ0UZ7PTrabekn_r-owSZg');
+        formData.append('willUploadAt', date ? date.getTime() : null);
+        formData.append('workspace', chosenWs.id);
         formData.append('video', file);
         formData.append('thumbnail', thumbnailFile);
 
         setIsUploading(true);
         if (socket.id) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}/drive/upload`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/drive/upload`, {
                 method: 'POST',
                 body: formData,
                 credentials: "include",
                 headers: {
                     'socket': socket.id,
-                    'authorization': `Bearer ${accessToken}`
                 }
             })
-                .then(res => res.json())
-                .then(res => {
-                    setIsUploading(false);
-                    toast.success(res.message);
-                    navigate('/dashboard')
-                });
+            if (!res.ok) {
+                if (res.status == 999) {
+                    const renewed = await AsyncFetcher({
+                        url: '/service/renew',
+                        cb: _ => { },
+                    });
+                    if (renewed) {
+                        // Original Request
+                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/drive/upload`, {
+                            method: 'POST',
+                            body: formData,
+                            credentials: "include",
+                            headers: {
+                                'socket': socket.id,
+                            }
+                        })
+                    } else toast.error('Please Login Again')
+                }
+            }
+            else {
+                const resJson = await res.json()
+                setIsUploading(false);
+                toast.success(resJson.message);
+                navigate('/dashboard')
+            }
         } else {
             console.log('Wait for socket initialized');
         }
