@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { AsyncFetcher } from '../../lib/Fetcher'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Duration } from 'luxon'
+import Loader from '../../components/loader'
 
-const Info = () => {
+const index = () => {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
     useEffect(() => {
@@ -17,9 +17,10 @@ const Info = () => {
     }, [])
     return (
         <>
-            Wait for Authentication ...
+            <Loader />
+            <p className='mt-16'>Wait for Authentication</p>
         </>
     )
 }
 
-export default Info
+export default index

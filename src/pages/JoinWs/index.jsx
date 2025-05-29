@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence, useAnimate } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, Calendar, Tag, Users } from 'lucide-react';
-import { useEffect } from 'react';
 import { AsyncFetcher } from '../../lib/Fetcher'
 import Loader from '../../components/loader'
 import { useParams, useNavigate } from 'react-router-dom';
 import { convertViews } from '../Dashboard/components/VideoCard'
 import { toast } from 'sonner';
 
-const JoinWS = () => {
+const index = () => {
     const [workspace, setWorkspace] = useState(null)
     const searchParams = useParams()
     const navigate = useNavigate()
@@ -249,4 +248,4 @@ const JoinWS = () => {
     )
 }
 
-export default JoinWS
+export default index

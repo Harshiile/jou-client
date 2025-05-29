@@ -1,16 +1,13 @@
-"use client";
-
-import { useState } from "react";
-import { CalendarIcon, Clock } from "lucide-react";
-import { format, isSameDay, isToday } from "date-fns";
-import { cn } from "@/lib/utils";
 import { Button } from "../../../components/ui/button";
-import { Calendar } from "../../../components/ui/calendar";
 import { Separator } from "../../../components/ui/separator";
 import { ScrollArea } from "../../../components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "../../../components/ui/sheet";
+
+import { useState } from "react";
+import { CalendarIcon, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
+import CustomCalendar from "./Calender";
 import { motion, AnimatePresence } from "framer-motion";
-import { CustomCalendar } from "./Calender";
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 15, scale: 0.98 },
@@ -18,7 +15,7 @@ const fadeInUp = {
     exit: { opacity: 0, y: 15, scale: 0.98, transition: { duration: 0.25, ease: "easeIn" } },
 };
 
-export function Schedule({ date, setDate, className }) {
+const Schedule = ({ date, setDate, className }) => {
     const [isOpen, setIsOpen] = useState(false);
     const hours = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -131,3 +128,5 @@ export function Schedule({ date, setDate, className }) {
         </Sheet>
     );
 }
+
+export default Schedule

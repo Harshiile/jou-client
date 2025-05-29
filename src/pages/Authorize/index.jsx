@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Users, Building2, Calendar, Tag } from 'lucide-react';
 import Loader from '../../components/loader';
 import { toast } from 'sonner';
 import { AsyncFetcher } from '../../lib/Fetcher';
 
-const Authorize = () => {
+const index = () => {
     const [data, setData] = useState(null);
     const searchParams = useParams();
     const navigate = useNavigate();
@@ -167,4 +166,4 @@ const Authorize = () => {
     );
 };
 
-export default Authorize;
+export default index;

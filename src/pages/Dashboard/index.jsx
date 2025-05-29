@@ -1,52 +1,101 @@
-import React, { useEffect, useState } from 'react';
+import { Separator } from '../../components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
+import { Button } from '../../components/ui/button';
+
+import { useEffect, useState } from 'react';
 import { AsyncFetcher } from '../../lib/Fetcher';
 import { useUser } from '../../context/user';
 import { useWorkSpaces } from '../../context/workspaces';
 import { useVideos } from '../../context/videos';
 import Calender from './components/Schedule/Calender';
-import { ChannelDrawer } from './components/ChannelDrawer';
-import VideoCard, { convertViews } from './components/VideoCard';
 import Loader from '../../components/loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import WorkspaceSlider from './components/WorkspaceSlider';
-import { Separator } from '../../components/ui/separator';
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
-import { Button } from '../../components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import invalid from '/invalid.jpg'
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
+import { ChannelDrawer, VideoCard, WorkspaceSlider } from './components';
+
+
+const PendingVideos = ({ videos, isReviewVideos, user, channel }) => {
+    return (
+        videos?.length > 0 ?
+            videos?.map(video => (
+                <motion.div
+                    key={video.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <VideoCard
+                        video={video}
+                        userType={user.userType}
+                        forUse={0}
+                        channel={channel}
+                    />
+                    <Separator className="bg-secondary" />
+                </motion.div>
+            ))
+            :
+            <motion.div
+                className="text-muted-foreground text-center col-span-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+            >
+                No {isReviewVideos ? 'Review' : 'Upload'} Pending Videos
+            </motion.div>
+    )
+}
+
+
+const index = () => {
     const [user] = useUser();
     const navigate = useNavigate()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [videos, setVideos] = useVideos();
     const [filterVideos, setFilterVideos] = useState();
-    const [pendingVideos, setPendingVideos] = useState(null);
+    const [pendingVideos, setPendingVideos] = useState({
+        review: null,
+        upload: null
+    });
     const [workSpaces, setWorkSpaces] = useWorkSpaces();
     const [channel, setChannel] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [hoveredWorkspace, setHoveredWorkspace] = useState(null);
+    const [isReviewVideos, setisReviewVideos] = useState(null)
 
     useEffect(() => {
-        if (user.id && !workSpaces) {
-            AsyncFetcher({
-                url: '/get/user/workspaces',
-                cb: ({ data }) => {
-                    setWorkSpaces(new Map(Object.entries(data.workspaces)))
-                },
-            });
-            AsyncFetcher({
-                url: '/get/user/videos?type=reviewPending',
-                cb: ({ data }) => {
-                    setPendingVideos(data.videos);
-                },
-            });
-        }
-    }, [user, workSpaces]);
+        AsyncFetcher({
+            url: '/get/user/workspaces',
+            cb: ({ data }) => {
+                setWorkSpaces(new Map(Object.entries(data.workspaces)))
+            },
+        });
+        AsyncFetcher({
+            url: '/get/user/videos',
+            cb: ({ data }) => {
+                const reviewPendingVideos = []
+                const uploadPendingVideos = []
+                data.videos.filter(v => {
+                    if (v.status == 'reviewPending') reviewPendingVideos.push(v);
+                    else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
+                })
+                setPendingVideos({
+                    review: reviewPendingVideos,
+                    upload: uploadPendingVideos
+                });
+                setisReviewVideos(true);
+            },
+        });
+    }, [])
 
     return (
         <>
+            {hoveredWorkspace && <WorkspaceSlider workspace={hoveredWorkspace} />}
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className='bg-primary border-none py-10'>
                     <DialogHeader className='mx-auto mb-3'>
@@ -89,16 +138,20 @@ const Dashboard = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <motion.button
-                            className="absolute top-2 right-2 bg-white text-primary p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Add New WorkSpace"
-                            whilegover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={_ => setIsDialogOpen(true)}
-                        >
-                            <Plus size={16} />
-                        </motion.button>
+                        {
+                            user.userType == 'youtuber' &&
+                            <motion.button
+                                className="absolute top-2 right-2 bg-white text-primary p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Add New WorkSpace"
+                                whilegover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={_ => setIsDialogOpen(true)}
+                            >
+                                <Plus size={16} />
+                            </motion.button>
+                        }
                         <p className="text-lg font-semibold mb-3">Workspaces</p>
+
 
                         <div className="flex flex-wrap gap-4 h-full">
                             {
@@ -113,10 +166,25 @@ const Dashboard = () => {
                                                     key={idx}
                                                     whilehover={{ scale: 1.05 }}
                                                     transition={{ type: 'spring', stiffness: 180 }}
-                                                    className={`relative w-24 h-24 rounded-full overflow-hidden  ${ws.disconnected ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                                    className={`relative w-24 h-24 rounded-full overflow-hidden border-4 border-secondary ${ws.disconnected ? 'cursor-pointer' : 'cursor-pointer'}`}
                                                     onClick={() => {
                                                         if (ws.disconnected) {
-                                                            toast.error('Workspace Is Inactive');
+                                                            toast.error(
+                                                                <div className="flex items-center justify-between gap-4">
+                                                                    <span>Workspace is Inactive</span>
+                                                                    <Button
+                                                                        className="px-3 py-1 h-auto bg-white text-black font-semibold hover:bg-white hover:text-black hover:font-semibold hover:cursor-pointer"
+                                                                        onClick={() => {
+                                                                            AsyncFetcher({
+                                                                                url: `/youtube/re-connect?id=${ws.id}`,
+                                                                                cb: ({ data }) => window.location.href = data.url
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        Reconnect
+                                                                    </Button>
+                                                                </div>
+                                                            );
                                                             return;
                                                         }
                                                         setIsDrawerOpen(!isDrawerOpen);
@@ -129,11 +197,11 @@ const Dashboard = () => {
                                                             },
                                                         });
                                                     }}
-                                                    onMouseEnter={() => setHoveredWorkspace(ws)}
+                                                    onMouseEnter={() => !ws.disconnected && setHoveredWorkspace(ws)}
                                                     onMouseLeave={() => setHoveredWorkspace(null)}
                                                 >
                                                     <img
-                                                        src={ws.avatar}
+                                                        src={ws.disconnected ? invalid : ws.avatar}
                                                         alt={ws.name}
                                                         className={`w-full h-full object-cover`}
                                                     />
@@ -172,53 +240,49 @@ const Dashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
-                    <p className="text-lg font-semibold mb-3">Pending Videos</p>
+                    <div className='flex items-start gap-x-5'>
+                        <p className="text-lg font-semibold mb-3">Pending Videos</p>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className='bg-white text-black font-bold hover:bg-white hover:text-black hover:ont-bold hover:cursor-pointer'
+                                        onClick={_ => setisReviewVideos(!isReviewVideos)}
+                                    >{isReviewVideos ? 'Review Pending' : 'Upload Pending'}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p>Switch to {!isReviewVideos ? 'Review' : 'Upload'} Pending Videos</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                    </div>
                     <div className="w-full h-[95%] overflow-y-auto custom-scroll">
                         <AnimatePresence>
                             {
-                                !pendingVideos ?
+                                isReviewVideos == null ?
                                     <Loader />
                                     :
-                                    pendingVideos?.length > 0 ? (
-                                        pendingVideos.map((video) => (
-                                            <motion.div
-                                                key={video.id}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                {/* <VideoCard
-                                                    video={video}
-                                                    userType={user.userType}
-                                                    forUse={0}
-                                                    channel={channel}
-                                                /> */}
-                                                <Separator className="bg-secondary" />
-                                            </motion.div>
-                                        ))
-                                    ) :
-                                        <motion.div
-                                            className="text-muted-foreground text-center col-span-full"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                        >
-                                            No pending videos
-                                        </motion.div>
-
+                                    <PendingVideos
+                                        user={user}
+                                        channel={channel}
+                                        isReviewVideos={isReviewVideos}
+                                        videos={isReviewVideos ? pendingVideos.review : pendingVideos.upload}
+                                    />
                             }
-
                         </AnimatePresence>
                     </div>
                 </motion.div >
             </motion.div >
 
-            {hoveredWorkspace && <WorkspaceSlider workspace={hoveredWorkspace} />}
+
         </>
     );
 };
 
-export default Dashboard;
+export default index;
 
 
 

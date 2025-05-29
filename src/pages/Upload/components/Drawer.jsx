@@ -1,4 +1,3 @@
-import React from 'react';
 import { Drawer, DrawerContent, DrawerTitle } from '../../../components/ui/drawer';
 import { Progress } from '../../../components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';

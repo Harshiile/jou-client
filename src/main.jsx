@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { App, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink, Authorize } from '../src/pages'
+import { Home, Dashboard, Info, JoinWS, Layout, Login, Upload, ReviewLink, Authorize } from '../src/pages'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ContextProvider from './context/Context'
 import { Toaster } from "./components/ui/sonner"
@@ -11,7 +11,7 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ContextProvider>
       <Routes>
-        <Route path='/' element={<App />} />
+        <Route path='/' element={<Home />} />
         <Route path='/get/youtube/info' element={
           <AuthMiddleWare>
             <Info />
@@ -50,3 +50,19 @@ createRoot(document.getElementById('root')).render(
     <Toaster richColors />
   </BrowserRouter>
 )
+
+
+
+
+/*
+Login --
+Info --
+Authorize --
+JoinWS --
+Layout --
+Upload --
+Dashboard --
+
+Review
+Home
+*/

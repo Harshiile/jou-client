@@ -1,14 +1,16 @@
+import { Button } from '../../../components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog'
+
 import { Clock, Eye } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Duration } from 'luxon'
-import nonThumbnail from '/nonThumbnail.jpg'
-import { Button } from '../../../components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog'
+import invalid from '/invalid.jpg'
 import { AsyncFetcher } from '../../../lib/Fetcher'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Schedule } from '../../Upload/components/Schedule'
+import Schedule from '../../Upload/components/Schedule'
 import { toast } from 'sonner'
+
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -153,7 +155,7 @@ const VideoCard = ({ video, userType, isForDialog, channel, className }) => {
                                         ? video.status !== 'uploaded'
                                             ? `http://localhost:3000/api/get/stream/file?type=image&id=${video.thumbnail}`
                                             : video.thumbnail
-                                        : nonThumbnail
+                                        : invalid
                                 }
                                 alt={video.title}
                                 className="h-full w-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"

@@ -1,4 +1,3 @@
-import React from "react";
 import {
     startOfMonth,
     endOfMonth,
@@ -14,7 +13,7 @@ import {
 } from "date-fns";
 import { ArrowRightCircle, ArrowLeftCircle } from 'lucide-react'
 
-export const CustomCalendar = ({ selectedDate, onDateSelect }) => {
+const CustomCalendar = ({ selectedDate, onDateSelect }) => {
     const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
     const renderHeader = () => (
@@ -96,3 +95,5 @@ export const CustomCalendar = ({ selectedDate, onDateSelect }) => {
         </div>
     );
 }
+
+export default CustomCalendar

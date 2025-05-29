@@ -14,12 +14,11 @@ import PastLink from './PastLink'
 import { format } from "date-fns"
 import { toast } from 'sonner'
 
-const ReviewLink = () => {
+const index = () => {
     const [user] = useUser()
     const searchParams = useParams()
     const [isVideoProcessDone, setIsVideoProcessDone] = useState(false)
     const [isVideoHovered, setIsVideoHovered] = useState(false);
-    const [confirmApprove, setConfirmApprove] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState(false);
     const [open, setOpen] = useState(false)
     const [dialogData, setDialogData] = useState({
@@ -27,7 +26,6 @@ const ReviewLink = () => {
         desc: null,
         cta: null
     })
-    const [confirmReject, setConfirmReject] = useState(false);
     const [isLoading, setisLoading] = useState(true)
     const [video, setVideo] = useState(null)
 
@@ -214,7 +212,7 @@ const ReviewLink = () => {
                                                             Cancel
                                                         </Button>
                                                         <Button
-                                                            className={dialogData.cta == 'Approve' ? "bg-green-400 text-black" : "bg-red-500"}
+                                                            className={`hover:cursor-pointer font-bold ${dialogData.cta == 'Approve' ? "bg-green-400 text-black hover:bg-green-500 hover:text-black" : "bg-red-500 hover:bg-red-600"}`}
                                                             onClick={() => handleApprove(dialogData.cta == 'Approve' ? true : false)}
                                                         >
                                                             {dialogData.cta}
@@ -232,4 +230,4 @@ const ReviewLink = () => {
     )
 }
 
-export default ReviewLink
+export default index

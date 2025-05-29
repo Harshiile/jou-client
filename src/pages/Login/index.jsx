@@ -1,28 +1,21 @@
-import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import logo from '/logo.png';
-
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-
-import { AsyncFetcher } from '../../lib/Fetcher';
+import { useState } from 'react';
+import { toast } from "sonner";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUser } from '../../context/user';
 import { useNavigate } from 'react-router-dom';
+import { AsyncFetcher } from '../../lib/Fetcher';
 
-const Login = () => {
+
+const index = () => {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
-    const [_, setUser] = useUser();
+    const [user, setUser] = useUser();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
@@ -188,4 +181,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default index;

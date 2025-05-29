@@ -1,32 +1,16 @@
-"use client"
-
-import { Clock, Eye, ArrowUpDown } from 'lucide-react';
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage
-} from "../../../components/ui/avatar";
-import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader
-} from "../../../components/ui/drawer";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "../../../components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
+import { Drawer, DrawerContent, DrawerHeader } from "../../../components/ui/drawer";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import { Separator } from '../../../components/ui/separator';
-import { Link } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
-import { useVideos } from '../../../context/videos';
-import { useUser } from '../../../context/user';
 import { Input } from '../../../components/ui/input';
+
+import { Link } from 'react-router-dom';
+import { useUser } from '../../../context/user';
 import Loader from '../../../components/loader';
+import { ArrowUpDown } from 'lucide-react';
 import VideoCard, { convertViews } from './VideoCard';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AsyncFetcher } from '../../../lib/Fetcher';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';

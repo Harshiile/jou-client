@@ -1,5 +1,3 @@
-import React, { useEffect, useRef, useState } from 'react';
-import UploaderDrawer from './components/Drawer';
 import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
@@ -8,17 +6,17 @@ import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
 import { Switch } from '../../components/ui/switch';
 import { ScrollArea } from '../../components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+
+import { useEffect, useRef, useState } from 'react';
 import { toast } from "sonner";
+import { useUser } from '../../context/user';
 import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { socket } from '../../socket';
-import { useUser } from '../../context/user';
-import FileInfo from './components/FileInfo';
-import { Schedule } from './components/Schedule';
 import { useNavigate } from 'react-router-dom';
-import YoutuberView from './components/YoutuberView';
-import ChooseWS from './components/ChooseWS';
 import { AsyncFetcher } from '../../lib/Fetcher'
+
+import { UploaderDrawer, FileInfo, ChooseWS, Schedule, CustomCalendar } from './components'
 
 const fadeIn = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -26,7 +24,7 @@ const fadeIn = {
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
-const Upload = () => {
+const index = () => {
     const navigate = useNavigate();
     const [file, setFile] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -54,7 +52,6 @@ const Upload = () => {
             url: '/get/user/workspaces',
             cb: ({ data }) => setWorkspacesForChooseWS(Array.from(new Map(Object.entries(data.workspaces))))
         })
-
         socket.connect();
         socket.on('uploading-progress', ({ percentage }) => setProgress(percentage));
         return () => socket.off('uploading-progress');
@@ -411,4 +408,4 @@ const Upload = () => {
     );
 };
 
-export default Upload;
+export default index;

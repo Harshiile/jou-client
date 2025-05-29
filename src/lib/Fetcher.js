@@ -1,7 +1,6 @@
 import { toast } from "sonner"
 
 
-
 export const AsyncFetcher = async ({ url, cb, methodType = 'GET', bodyData }) => {
     try {
         const fetchOptions = methodType === 'POST'
